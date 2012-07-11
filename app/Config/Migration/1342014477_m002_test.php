@@ -1,5 +1,5 @@
 <?php
-class M001Start extends CakeMigration {
+class M002Test extends CakeMigration {
 
 /**
  * Migration description
@@ -17,8 +17,24 @@ class M001Start extends CakeMigration {
  */
 	public $migration = array(
 		'up' => array(
+			'create_field' => array(
+				'subjects' => array(
+					'title' => array('type' => 'string', 'null' => false, 'default' => NULL, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8', 'after' => 'code'),
+				),
+			),
+			'drop_field' => array(
+				'subjects' => array('name',),
+			),
 		),
 		'down' => array(
+			'drop_field' => array(
+				'subjects' => array('title',),
+			),
+			'create_field' => array(
+				'subjects' => array(
+					'name' => array('type' => 'string', 'null' => false, 'default' => NULL, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
+				),
+			),
 		),
 	);
 

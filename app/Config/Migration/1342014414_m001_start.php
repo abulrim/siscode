@@ -1,5 +1,5 @@
 <?php
-class M002AddedBasicDatabaseStructure extends CakeMigration {
+class M001Start extends CakeMigration {
 
 /**
  * Migration description
@@ -65,6 +65,7 @@ class M002AddedBasicDatabaseStructure extends CakeMigration {
 				),
 				'subjects' => array(
 					'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+					'code' => array('type' => 'string', 'null' => false, 'default' => NULL, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 					'name' => array('type' => 'string', 'null' => false, 'default' => NULL, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 					'indexes' => array(
 						'PRIMARY' => array('column' => 'id', 'unique' => 1),
