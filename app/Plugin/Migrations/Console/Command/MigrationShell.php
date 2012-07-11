@@ -140,7 +140,7 @@ class MigrationShell extends Shell {
  * @return void
  */
 	public function main() {
-		$this->out($this->getOptionParser()->help());
+		$this->run();
 	}
 
 /**
@@ -328,9 +328,6 @@ class MigrationShell extends Shell {
 			if (!preg_match('/^([A-Za-z0-9_]+|\s)+$/', $name) || is_numeric($name[0])) {
 				$this->out('');
 				$this->err(__d('Migrations', 'Migration name (%s) is invalid. It must only contain alphanumeric characters and start with a letter.', $name));
-			} elseif (strlen($name) > 255) {
-				$this->out('');
-				$this->err(__d('Migrations', 'Migration name (%s) is invalid. It cannot be longer than 255 characters.', $name));
 			} else {
 				$name = str_replace(' ', '_', trim($name));
 				break;
