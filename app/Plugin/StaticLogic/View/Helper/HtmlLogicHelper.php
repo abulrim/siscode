@@ -81,76 +81,17 @@ class HtmlLogicHelper extends AppHelper{
                 }
         }
         
-        /*
-        public function cssOld($path, $rel = null, $options = array()){
-            $path=str_replace('.css','',$path);
-            $fullPath=APP . DS . 'webroot'. DS .'css' . DS . str_replace('/',DS,$path). '.css';
-            $fullMinPath=APP . DS . 'webroot'. DS .'css' .DS. 'min' . DS . str_replace('/',DS,$path). '.min.css';
-            
-            $minDirectory=APP . DS . 'webroot'. DS .'css' .DS. 'min';
-            
-            $fileName=$path;
-           
-            if(!preg_match("/http|min/",$path)){
-                if(Configure::read('debug')>0 && !file_exists($fullMinPath)){
-                    
-                    $pathArray=explode('/',$path);
-                    foreach($pathArray as $i=>$dir){
-                        $minDir=$minDirectory . DS . $dir;
-                        if($i==(count($pathArray)-1)){
-                            break;
-                        }
-                        if(!is_dir($minDir)){
-                            mkdir($minDir);
-                        }
-                    }
-
-                     YuiCompressor::compress($fullPath,$fullMinPath);
-                }
-                
-                if(file_exists($fullMinPath)){
-                    $fileName='min/'.$path.'.min';
-                }
-            }
-
-            return $this->Html->css($fileName,$rel,$options);
-        }
-        
-        public function scriptOld($path, $options=array()){
-            
-            $path=str_replace('.js','',$path);
-            $fullPath=APP . DS . 'webroot'. DS .'js' . DS . str_replace('/',DS,$path). '.js';
-            $fullMinPath=APP . DS . 'webroot'. DS .'js' .DS. 'min' . DS . str_replace('/',DS,$path). '.min.js';
-            
-            $minDirectory=APP . DS . 'webroot'. DS .'js' .DS. 'min';
-            
-            $fileName=$path;
-           
-            if(!preg_match("/http|min/",$path)){
-                if(Configure::read('debug')>0 && !file_exists($fullMinPath)){
-                    
-                    $pathArray=explode('/',$path);
-                    foreach($pathArray as $i=>$dir){
-                        $minDir=$minDirectory . DS . $dir;
-                        if($i==(count($pathArray)-1)){
-                            break;
-                        }
-                        if(!is_dir($minDir)){
-                            mkdir($minDir);
-                        }
-                    }
-
-                     YuiCompressor::compress($fullPath,$fullMinPath);
-                }
-                
-                if(file_exists($fullMinPath)){
-                    $fileName='min/'.$path.'.min';
-                }
-            }
-            
-           
-            
-            return $this->Html->script($fileName,$options);
-        }
-        */
+	
+	public function startTemplate($options = array()) {
+		$string = '<script type="text/template" ';
+		if (isset($options['id'])) {
+			$string .= 'id="' . $options['id'] . '" ';
+		}
+		$string .= '>';
+		return $string;
+	}
+	
+	public function endTemplate() {
+		return '</script>';
+	}
 }
