@@ -26,10 +26,12 @@
  * to use (in this case, /app/View/Pages/home.ctp)...
  */
 	Router::connect('/', array('controller' => 'courses', 'action' => 'index'));
+	Router::connect('/c/*', array('controller' => 'courses', 'action' => 'index'));
 /**
  * ...and connect the rest of 'Pages' controller's urls.
  */
 
+	Router::parseExtensions('json');
 /**
  * Load all plugin routes.  See the CakePlugin documentation on 
  * how to customize the loading of plugin routes.

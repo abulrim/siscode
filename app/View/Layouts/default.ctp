@@ -11,6 +11,8 @@
 	<?php echo $this->HtmlLogic->script('underscore-min'); ?>
 	<?php echo $this->HtmlLogic->script('handlebars-1.0.0.beta.6'); ?>
 	<?php echo $this->HtmlLogic->script('backbone-min'); ?>
-	<?php echo $this->HtmlLogic->script('script'); ?>
+	<?php echo $this->HtmlLogic->script('course-input-module'); ?>
+	<?php //echo $this->HtmlLogic->script('course-schedule-module'); ?>
+	<?php //echo $this->HtmlLogic->script('common'); ?>
 </body>
 </html>
