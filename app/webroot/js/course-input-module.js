@@ -31,7 +31,11 @@
 		CourseCollection,
 		MyCourseCollection,
 		CourseScheduleView,
-		MyCourseScheduleView;
+		MyCourseScheduleView,
+		
+		CourseSlotModel,
+		CourseSlotCollection,
+		CourseSlotView;
 	
 	CourseInputModel = Backbone.Model.extend({
 		defaults: {
@@ -119,6 +123,14 @@
 	MyCourseInputListView = new CourseInputListView({collection:MyCourseInputCollection});
 	
 	/**************************************************************/
+	/* Here starts the second module */
+	CourseSlotModel = Backbone.Model.extend({
+	});
+	
+	CourseSlotCollection = Backbone.Collection.extend({
+		model: CourseSlotModel
+	});
+	
 	CourseModel = Backbone.Model.extend({
 	});
 	
@@ -126,10 +138,30 @@
 		model: CourseModel,
 		url: '/siscode/courses/fetch',
 		
+		initialize: function() {
+			this.on('reset', this.fixSlots, this);
+		},
+		
+		fixSlots: function(col) {
+			var courseSlot;
+			_.each(col.models, function(model){
+				courseSlot = model.get('CourseSlot');
+				_.each(courseSlot.models, function(courseSlotModel) {
+					courseSlotModel.courseModel = model;
+				});
+			});
+		},
+		
 		parse: function(response) {
 			var data = [];
 			_.each(response.content, function(item) {
-				data.push(item.Course);
+				var courseSlotModels = [], modelData;
+				_.each(item.CourseSlot, function(courseSlotData) {
+					courseSlotModels.push(new CourseSlotModel(courseSlotData));
+				});
+				modelData = item.Course;
+				modelData.CourseSlot = new CourseSlotCollection(courseSlotModels);
+				data.push(modelData);
 			});
 			return data;
 		}
@@ -143,29 +175,37 @@
 		},
 		
 		addAll: function(col) {
+			this.$('.schedule-list').html('');
 			var self = this;
 			_.each(col.models, function(model) {
 				self.addOne(model);
 			});
 		},
 		
-		addOne: function(model) {
-			var view = new CourseView({model:model});
-			view.render();
-			this.$('.schedule-list').append(view.$el);
+		addOne: function(model) {	
+			var view,
+				$list;
+			$list = this.$('.schedule-list');
+			_.each(model.get('CourseSlot').models, function (modelSlot) {
+				view = new CourseSlotView({model:modelSlot});
+				view.render();
+				$list.append(view.$el);
+			});
 		}
-		
 	});
 	
-	CourseView = Backbone.View.extend({
+	CourseSlotView = Backbone.View.extend({
 		tagName: 'li',
 		
 		render: function() {
 			var $template,
-				compiled;
-			$template = $('#course-view-tmpl').html();
+				compiled,
+				data;
+			$template = $('#course-slot-view-tmpl').html();
 			compiled = H.compile($template);
-			this.$el.html(compiled(this.model.toJSON()));
+			data = this.model.toJSON();
+			data.Course = this.model.courseModel.toJSON();
+			this.$el.html(compiled(data));
 			return this;
 		}
 	});

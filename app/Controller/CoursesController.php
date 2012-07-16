@@ -10,12 +10,11 @@ class CoursesController extends AppController {
 	}
 	
 	public function fetch() {
-		
+		$this->Course->contain('CourseSlot');
 		$courses = $this->Course->find('all', array(
-			'limit' => 5,
+			'limit' => count($this->request->data),
 			'order' => 'RAND()'
 		));
-		
 		$content = array(
 			'status' => 'success',
 			'content' => $courses

@@ -22,6 +22,6 @@
 <?php echo $this->HtmlLogic->endTemplate();?>
 
 	
-<?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-view-tmpl'));?>
-	Title: {{title}}, CRN: {{crn}}
+<?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
+	Title: {{Course.title}}, CRN: {{Course.crn}}, start time: {{start_time}}, end time: {{end_time}}
 <?php echo $this->HtmlLogic->endTemplate();?>
