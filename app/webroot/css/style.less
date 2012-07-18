@@ -1,0 +1,212 @@
+@column-width: 14.25%;
+@row-height: 40px;
+@cil-width: 330px;
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333;
+}
+
+.wrapper {
+	position: relative;
+	padding-left: @cil-width + 10px;
+}
+
+.cil {
+	//float: left;
+	position: absolute;
+	top:0px;
+	left:0px;
+	width: @cil-width;
+}
+.schedule {
+	//float: left;
+	font-size: 12px;
+	position: relative;
+	min-width: 750px;
+	margin: 5px 0 0 20px;
+	height: 518px;
+	border: #CCC thin solid;
+	border-top-left-radius: 11px;
+	border-top-right-radius: 11px;
+	.striped-background;
+}
+.striped-background {
+	background: url('../img/background.png');
+	background: repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
+	background: -webkit-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
+	background: -moz-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
+	background: -o-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
+}
+.column {
+	position: relative;
+	float: left;
+	width: @column-width;
+	height: 100%;
+	border-right: thin solid #CCC;
+}
+.column.last {
+	border-right: none;
+}
+.time-slots {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.time-slots li {
+	height: @row-height;
+	width: 100%;
+	text-align: center;
+	line-height: @row-height;
+}
+.schedule-header {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 38px;
+	width: 100%;
+	border-bottom: solid thin #CCC;
+}
+.weekdays {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.weekdays li {
+	float: left;
+	width: @column-width;
+	height: @row-height;
+	line-height: @row-height;
+	text-align: center;
+}
+.course-number:focus, .course-crn:focus {
+	border-color: rgba(82, 168, 236, 0.8);
+	outline: 0;
+	outline: thin dotted 9;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),0 0 8px rgba(82, 168, 236, 0.6);
+	-moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(82,168,236,0.6);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),0 0 8px rgba(82, 168, 236, 0.6);
+}
+.course-number, .course-crn {
+	width: 50px;
+	height: 16px;
+	padding: 4px;
+	background-color: white;
+	border: 1px solid #CCC;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-webkit-transition: border linear .2s,box-shadow linear .2s;
+	-moz-transition: border linear .2s,box-shadow linear .2s;
+	-ms-transition: border linear .2s,box-shadow linear .2s;
+	-o-transition: border linear .2s,box-shadow linear .2s;
+	transition: border linear .2s,box-shadow linear .2s;
+}
+.cli-course-input {
+	margin: 5px 0 5px 0;
+}
+#add-course, .cil-submit {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	display: inline-block;
+	padding: 4px 10px 4px;
+	margin-bottom: 0;
+	font-size: 13px;
+	line-height: 18px;
+	color: #333;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: whiteSmoke;
+	background-image: -ms-linear-gradient(top, white, #E6E6E6);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#E6E6E6));
+	background-image: -webkit-linear-gradient(top, white, #E6E6E6);
+	background-image: -o-linear-gradient(top, white, #E6E6E6);
+	background-image: linear-gradient(top, white, #E6E6E6);
+	background-image: -moz-linear-gradient(top, white, #E6E6E6);
+	background-repeat: repeat-x;
+	border: 1px solid #CCC;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	border-color: #E6E6E6 #E6E6E6 #BFBFBF;
+	border-bottom-color: #B3B3B3;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+	filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.cil-submit {
+	background-color: #0074CC;
+	background-image: -ms-linear-gradient(top, #08C, #05C);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#08C), to(#05C));
+	background-image: -webkit-linear-gradient(top, #08C, #05C);
+	background-image: -o-linear-gradient(top, #08C, #05C);
+	background-image: -moz-linear-gradient(top, #08C, #05C);
+	background-image: linear-gradient(top, #08C, #05C);
+	background-repeat: repeat-x;
+	border-color: #05C #05C #003580;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088cc', endColorstr='#0055cc', GradientType=0);
+	filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+	color: white;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.cil-submit:active {
+	background-image: none;
+	outline: 0;
+	-webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.cil-submit:hover {
+	background-color: #05C;
+	background-position: 0 -15px;
+}
+#add-course:active {
+	background-color: #E6E6E6;
+	background-color: #D9D9D9 9;
+	background-image: none;
+	outline: 0;
+	-webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+#add-course:hover {
+	color: #333;
+	text-decoration: none;
+	background-color: #E6E6E6;
+	background-position: 0 -15px;
+}
+.remove-course-btn {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	background-image: url("../img/glyphicons-halflings.png");
+  background-position: -312px 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+.remove-course-btn:hover {
+  background-position: -456px 0;
+}
+input {
+	color: #555;
+}
+.course-subject {
+	width: 180px;
+}
+#logo {
+	width: 168px;
+	height: 42px;
+	background: url(../img/title.png);
+	margin: 20px 0 20px 50px;
+}
+.clear {
+	clear: both;
+}

@@ -3,17 +3,20 @@
 
 (function ($, Backbone, _, H, undef) {
 	"use strict";
-	
-	 H.registerHelper('equal', function(lvalue, rvalue, options) {
+
+	//Handlebars 'equal' helper, enables us to select an option
+	H.registerHelper('equal', function(lvalue, rvalue, options) {
 		if (arguments.length < 3)
-				throw new Error("Handlebars Helper equal needs 2 parameters");
+			throw new Error("Handlebars Helper equal needs 2 parameters");
 		if( lvalue!=rvalue ) {
-				return options.inverse(this);
+			return options.inverse(this);
 		} else {
-				return options.fn(this);
+			return options.fn(this);
 		}
 	});
-
+	
+	
+	//All variables go here
 	var CourseInputModel,
 		CourseInputCollection,
 		MyCourseInputCollection,
@@ -37,6 +40,10 @@
 		CourseSlotCollection,
 		CourseSlotView;
 	
+	
+	/**** First module responsible for getting data from the inputs ****/
+	
+	//Course model
 	CourseInputModel = Backbone.Model.extend({
 		defaults: {
 			subject_id: 1,
@@ -49,6 +56,7 @@
 		}
 	});
 	
+	//Course view
 	CourseInputView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'cli-course-input',
@@ -59,7 +67,12 @@
 			$tmpl = $('#course-input-tmpl');
 			compiled = H.compile($tmpl.html());
 			this.$el.html(compiled(this.model.toJSON()));
+			
 			return this;
+		},
+		
+		afterRender: function() {
+			this.$('select').chosen();
 		},
 		
 		initialize: function() {
@@ -75,10 +88,12 @@
 		}
 	});
 
+	//Course collection, has all the courses inside it
 	CourseInputCollection = Backbone.Collection.extend({
 		model: CourseInputModel
 	});
 	
+	//Course collection view, updates the URL and fills the courses
 	CourseInputListView = Backbone.View.extend({
 		el: '.cil',
 		
@@ -92,6 +107,7 @@
 			view.render();
 			$viewEl = view.$el;
 			this.$('.cil-courses').append($viewEl);
+			view.afterRender();
 		},
 		
 		addInputModel: function() {
@@ -119,54 +135,87 @@
 		}
 	});
 	
+	
+	//Create the necessary models and views
 	MyCourseInputCollection = new CourseInputCollection();
 	MyCourseInputListView = new CourseInputListView({collection:MyCourseInputCollection});
 	
-	/**************************************************************/
-	/* Here starts the second module */
+	
+	/**** End of First Module ****/
+	
+	/**********************************************************************/
+	
+	/**** Second module responsible for displaying the actual schedule ****/
+	
+	//Each Course has a CourseSlot that will appear on the screen
 	CourseSlotModel = Backbone.Model.extend({
 	});
 	
+	//The CourseSlot collection
 	CourseSlotCollection = Backbone.Collection.extend({
 		model: CourseSlotModel
 	});
 	
+	//The CourseModel that we will be fetching from the server
 	CourseModel = Backbone.Model.extend({
 	});
 	
+	//The CourseModels will be encapsulated inside the CourseCollection
 	CourseCollection = Backbone.Collection.extend({
 		model: CourseModel,
+		
+		//Specify the url where the courses will be fetched
 		url: '/siscode/courses/fetch',
+		
+		//Each course has a specific color
+		colors: ['#73A5F7','#FF828E', '#FF71FF', '#FFFF80', '#AFA', '#FFA980'],
 		
 		initialize: function() {
 			this.on('reset', this.fixSlots, this);
 		},
 		
+		//Here we assign a color to each course and put the course info inside the course slots
 		fixSlots: function(col) {
-			var courseSlot;
-			_.each(col.models, function(model){
+			var courseSlot, self, color;
+			self = this;
+			_.each(col.models, function(model, key){
+				//Set a color for each CourseModel
+				if(self.colors[key] !== undef) {
+					color = self.colors[key];
+				} else {
+					color = self.colors[key%self.colors.length];
+				}
+				model.set('color', color);
+				//Get the courseSlot which are in turn models
 				courseSlot = model.get('CourseSlot');
 				_.each(courseSlot.models, function(courseSlotModel) {
+					//Put the courseModel in the courseSlot (inception!) so we can easily retrieve the course info
 					courseSlotModel.courseModel = model;
 				});
 			});
 		},
 		
+		//Get the data from the server and create the corresponding models and collections
 		parse: function(response) {
 			var data = [];
+			//The reponse that we get from the server has 'status' and 'content', inside content we have an array that has 'Course' and 'CourseSlot' 
 			_.each(response.content, function(item) {
 				var courseSlotModels = [], modelData;
 				_.each(item.CourseSlot, function(courseSlotData) {
+					//Fill the courseSlotModels array with each course slot
 					courseSlotModels.push(new CourseSlotModel(courseSlotData));
 				});
+				//inside modelData put the Course info and the CourseSlot as a collection
 				modelData = item.Course;
 				modelData.CourseSlot = new CourseSlotCollection(courseSlotModels);
+				//Store all the model data inside 'data' variable that will be returned later
 				data.push(modelData);
 			});
 			return data;
 		}
 	});
 	
+	//CourseScheduleView is the view of the CourseCollection holding all the courses fetched
 	CourseScheduleView = Backbone.View.extend({
 		el: '.schedule',
 		
@@ -184,18 +233,33 @@
 		
 		addOne: function(model) {	
 			var view,
-				$list;
-			$list = this.$('.schedule-list');
+				$list,
+				self,
+				topPos,
+				startTime;
+			self = this;
 			_.each(model.get('CourseSlot').models, function (modelSlot) {
 				view = new CourseSlotView({model:modelSlot});
 				view.render();
+				$list = self.$('.day-' + modelSlot.get('day'));
 				$list.append(view.$el);
+				startTime = modelSlot.get('start_time');
+				startTime = startTime.split(':');
+				startTime[0] = +startTime[0];
+				startTime[1] = +startTime[1];
+				startTime = (startTime[0] - 7) + startTime[1]/60;
+				topPos = 40+startTime*40;
+				view.$el.css({
+					position: 'absolute',
+					top: topPos + 'px'
+				});
 			});
 		}
 	});
 	
+	//The CourseSlot view
 	CourseSlotView = Backbone.View.extend({
-		tagName: 'li',
+		tagName: 'div',
 		
 		render: function() {
 			var $template,
@@ -206,12 +270,20 @@
 			data = this.model.toJSON();
 			data.Course = this.model.courseModel.toJSON();
 			this.$el.html(compiled(data));
+			this.$el.css('background-color', this.model.courseModel.get('color'));
 			return this;
 		}
 	});
 	
+	//Create the necessary collections and views
 	MyCourseCollection = new CourseCollection();
 	MyCourseScheduleView = new CourseScheduleView({collection:MyCourseCollection});
+	
+	/***** End of the second module ****/
+	
+	/**********************************************************************/
+	
+	/**** Router module common to both modules  ****/
 	
 	AppRouter = Backbone.Router.extend({
 		routes: {
@@ -262,4 +334,6 @@
 	
 	Backbone.history.start({pushState: true, root: '/siscode/'});
 
+	/**** End of Router Module ****/
+	
 }(jQuery, Backbone, _, Handlebars));
