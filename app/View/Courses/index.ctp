@@ -5,6 +5,20 @@
 	<section class="cil">
 		<div class="cil-courses">
 		</div>
+		<section class="filters">
+			<h2><i class="filter-btn"></i>Filter by day:</h2>
+			<table class="filters-table">
+				<tr><td>M</td><td>T</td><td>W</td><td>R</td><td>F</td><td>S</td></tr>
+				<tr>
+					<td><input type="checkbox" name="filter[1]" checked="checked" value="1" /></td>
+					<td><input type="checkbox" name="filter[2]" checked="checked" value="2" /></td>
+					<td><input type="checkbox" name="filter[3]" checked="checked" value="3" /></td>
+					<td><input type="checkbox" name="filter[4]" checked="checked" value="4" /></td>
+					<td><input type="checkbox" name="filter[5]" checked="checked" value="5" /></td>
+					<td><input type="checkbox" name="filter[6]" checked="checked" value="6" /></td>
+				</tr>
+			</table>
+		</section>
 		<input type="button" id="add-course" name="addCourse" value="Add course"/>
 		<input type="button" class="cil-submit" value="Submit" />
 	</section>
@@ -38,15 +52,13 @@
 				<li>6:00pm - 7:00pm</li>
 			</ul>
 		</div>
-		<div class="column day-1"></div>
-		<div class="column day-2"></div>
-		<div class="column day-3"></div>
-		<div class="column day-4"></div>
-		<div class="column day-5"></div>
-		<div class="column last  day-6"></div>
+		<div class="column day-1 schedule-day"></div>
+		<div class="column day-2 schedule-day"></div>
+		<div class="column day-3 schedule-day"></div>
+		<div class="column day-4 schedule-day"></div>
+		<div class="column day-5 schedule-day"></div>
+		<div class="column last day-6 schedule-day"></div>
 
-		<ul class="schedule-list">
-		</ul>
 	</section>
 </div>
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>

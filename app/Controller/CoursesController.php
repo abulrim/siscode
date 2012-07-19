@@ -12,7 +12,7 @@ class CoursesController extends AppController {
 	public function fetch() {
 		$this->Course->contain('CourseSlot');
 		$courses = $this->Course->find('all', array(
-			'limit' => count($this->request->data),
+			'limit' => count($this->request->data['course']),
 			'order' => 'RAND()'
 		));
 		$content = array(

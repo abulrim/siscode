@@ -1,31 +1,41 @@
-@column-width: 14.25%;
+@column-width: 14%;
 @row-height: 40px;
 @cil-width: 330px;
 
+html {
+	margin: 0;
+	padding: 0;
+}
 body {
+	margin-bottom: 0;
+	margin-top:0;
+	display: block;
+	margin: 0;
+	padding: 0;
 	font-family: Arial, Helvetica, sans-serif;
 	color: #333;
 }
 
+
 .wrapper {
 	position: relative;
-	padding-left: @cil-width + 10px;
+	padding-left: @cil-width + 15px;
+	padding-right: 10px;
 }
 
 .cil {
-	//float: left;
 	position: absolute;
 	top:0px;
-	left:0px;
+	left:10px;
 	width: @cil-width;
 }
+
 .schedule {
-	//float: left;
 	font-size: 12px;
 	position: relative;
 	min-width: 750px;
-	margin: 5px 0 0 20px;
-	height: 518px;
+	margin: 5px 0 0 0px;
+	height: @row-height * 13px;
 	border: #CCC thin solid;
 	border-top-left-radius: 11px;
 	border-top-right-radius: 11px;
@@ -209,4 +219,31 @@ input {
 }
 .clear {
 	clear: both;
+}
+.course-slot {
+	border: thin solid;
+	border-radius: 3px;
+	margin: 0 2px;
+	padding: 0 3px;
+	overflow: hidden;
+}
+.filters {
+	font-size: 12px;
+	margin: 20px 0 15px 0;
+}
+.filters-table tr td {
+	text-align: center;
+}
+.filters h2 {
+	font-size: 14px;
+	margin-bottom: 5px;
+}
+.filter-btn {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	background-image: url("../img/glyphicons-halflings.png");
+  background-position: -408px -144px;
+	background-repeat: no-repeat;
+	margin-right: 5px;
 }

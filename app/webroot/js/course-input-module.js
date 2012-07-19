@@ -6,9 +6,10 @@
 
 	//Handlebars 'equal' helper, enables us to select an option
 	H.registerHelper('equal', function(lvalue, rvalue, options) {
-		if (arguments.length < 3)
+		if (arguments.length < 3) {
 			throw new Error("Handlebars Helper equal needs 2 parameters");
-		if( lvalue!=rvalue ) {
+		}
+		if(+lvalue !== +rvalue ) {
 			return options.inverse(this);
 		} else {
 			return options.fn(this);
@@ -97,6 +98,11 @@
 	CourseInputListView = Backbone.View.extend({
 		el: '.cil',
 		
+		events: {
+			"click #add-course"	: 'addInputModel',
+			"click .cil-submit"	: 'updateUrl'
+		},
+		
 		initialize: function() {
 			this.collection.on('add', this.addInput, this);
 		},
@@ -116,7 +122,7 @@
 		},
 		
 		updateUrl: function() {
-			var data = [], url = '';
+			var data = [], url = '', days = [], val;
 			this.$('.cli-course-input').each(function() {
 				data.push([
 					$(this).find('select[name=subject_id]').val(),$(this).find('input[name=number]').val(),$(this).find('input[name=crn]').val()
@@ -125,14 +131,27 @@
 			_.each(data, function(item) {
 				url = url + item.join('-') + '_';
 			});
-			url = 'c/' + url.substr(0, url.length-1);
+			$('input[name^="filter"]').each(function(){
+				if ($(this).prop('checked')) {
+					days.push($(this).val());
+				}
+			});
+			days = days.join('-') + '_';
+			url = 'c/' + days + url.substr(0, url.length-1);
 			MyAppRouter.navigate(url, {trigger: true});
 		},
 		
-		events: {
-			"click #add-course"	: 'addInputModel',
-			"click .cil-submit"	: 'updateUrl'
+		updateFilters: function(days) {
+		 var $boxes, self;
+		 self = this;
+		 $boxes = self.$('input[name^="filter"]');
+		 $boxes.prop('checked', false);
+		 
+		 _.each(days, function(day) {
+			 self.$('input[name="filter[' + day + ']"]').prop('checked', true);
+		 });
 		}
+		
 	});
 	
 	
@@ -168,7 +187,32 @@
 		url: '/siscode/courses/fetch',
 		
 		//Each course has a specific color
-		colors: ['#73A5F7','#FF828E', '#FF71FF', '#FFFF80', '#AFA', '#FFA980'],
+		colors: [
+			{
+				background: '#73A5F7',
+				border: '#03F'
+			},
+			{
+				background: '#FF828E',
+				border: '#D80505'
+			},
+			{
+				background: '#FF71FF',
+				border: '#B300B3'
+			},
+			{
+				background: '#FFFF80',
+				border: '#FF0'
+			},
+			{
+				background: '#AFA',
+				border: '#80FF00'
+			},
+			{
+				background: '#FFA980',
+				border: '#FF8000'
+			}
+		],
 		
 		initialize: function() {
 			this.on('reset', this.fixSlots, this);
@@ -224,7 +268,7 @@
 		},
 		
 		addAll: function(col) {
-			this.$('.schedule-list').html('');
+			this.$('.schedule-day').html('');
 			var self = this;
 			_.each(col.models, function(model) {
 				self.addOne(model);
@@ -236,30 +280,41 @@
 				$list,
 				self,
 				topPos,
-				startTime;
+				startTime,
+				endTime,
+				height;
 			self = this;
 			_.each(model.get('CourseSlot').models, function (modelSlot) {
 				view = new CourseSlotView({model:modelSlot});
 				view.render();
 				$list = self.$('.day-' + modelSlot.get('day'));
 				$list.append(view.$el);
-				startTime = modelSlot.get('start_time');
-				startTime = startTime.split(':');
-				startTime[0] = +startTime[0];
-				startTime[1] = +startTime[1];
-				startTime = (startTime[0] - 7) + startTime[1]/60;
-				topPos = 40+startTime*40;
+				startTime = self.fixTime(modelSlot.get('start_time'));
+				endTime = self.fixTime(modelSlot.get('end_time'));
+				topPos = 40 + (startTime * 40);
+				height = 40 + (endTime * 40) - topPos;
 				view.$el.css({
 					position: 'absolute',
-					top: topPos + 'px'
+					top: topPos + 'px',
+					height: height + 'px'
 				});
 			});
+		},
+		
+		fixTime: function(time) {
+				time = time.split(':');
+				time[0] = +time[0];
+				time[1] = +time[1];
+				time = (time[0] - 7) + time[1]/60;
+				return time;
 		}
+		
 	});
 	
 	//The CourseSlot view
 	CourseSlotView = Backbone.View.extend({
 		tagName: 'div',
+		className: 'course-slot',
 		
 		render: function() {
 			var $template,
@@ -270,7 +325,10 @@
 			data = this.model.toJSON();
 			data.Course = this.model.courseModel.toJSON();
 			this.$el.html(compiled(data));
-			this.$el.css('background-color', this.model.courseModel.get('color'));
+			this.$el.css({
+				backgroundColor: this.model.courseModel.get('color').background,
+				borderColor: this.model.courseModel.get('color').border
+			});
 			return this;
 		}
 	});
@@ -298,8 +356,11 @@
 		fillCourseInput: function(d) {
 			var data = [],
 				models,
-				array;
+				array,
+				days;
 			data = d.split('_');
+			days = data.splice(0,1);
+			days = days[0].split('-');
 			_.each(data, function(item, key) {
 				array = item.split('-');
 				data[key] = {
@@ -320,7 +381,14 @@
 			_.each(data, function(modelData) {
 				MyCourseInputCollection.add(new CourseInputModel(modelData));
 			});
-		
+			
+			MyCourseInputListView.updateFilters(days);
+			
+			data = {
+				course: data,
+				days: days
+			};
+			
 			MyCourseCollection.fetch({
 				type: 'post',
 				data: {
@@ -329,7 +397,6 @@
 			});
 		}
 	});
-	
 	MyAppRouter = new AppRouter();
 	
 	Backbone.history.start({pushState: true, root: '/siscode/'});
