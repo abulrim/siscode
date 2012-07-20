@@ -58,7 +58,7 @@
 		<div class="column day-4 schedule-day"></div>
 		<div class="column day-5 schedule-day"></div>
 		<div class="column last day-6 schedule-day"></div>
-
+		<div class="paginator"></div>
 	</section>
 </div>
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>
@@ -75,5 +75,9 @@
 	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
 	Title: {{Course.title}}, CRN: {{Course.crn}}, start time: {{start_time}}, end time: {{end_time}}
+<?php echo $this->HtmlLogic->endTemplate();?>
+		
+<?php echo $this->HtmlLogic->startTemplate(array('id' => 'pagination-view-tmpl'));?>
+	<span class="previous">&lt;&lt; Previous</span> {{page}}/{{maxPage}} <span class="next">Next &gt;&gt;</span>
 <?php echo $this->HtmlLogic->endTemplate();?>
 	

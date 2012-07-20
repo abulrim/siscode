@@ -39,8 +39,8 @@
 		
 		CourseSlotModel,
 		CourseSlotCollection,
-		CourseSlotView;
-	
+		CourseSlotView,
+		PaginationView;
 	
 	/**** First module responsible for getting data from the inputs ****/
 	
@@ -98,9 +98,11 @@
 	CourseInputListView = Backbone.View.extend({
 		el: '.cil',
 		
+		page: 1,
+		
 		events: {
 			"click #add-course"	: 'addInputModel',
-			"click .cil-submit"	: 'updateUrl'
+			"click .cil-submit"	: 'updateUrlEvent'
 		},
 		
 		initialize: function() {
@@ -121,7 +123,19 @@
 			
 		},
 		
-		updateUrl: function() {
+		updateUrlEvent: function(){
+			this.updateUrl();
+		},
+		
+		updateUrl: function(action) {
+			if (action === undef) {
+				this.page = 1;
+			} else if(action === -1) {
+				this.page -= 1;
+			} else if (action === 1) {
+				this.page += 1;
+			}
+			this.page = Math.max(1, this.page); 
 			var data = [], url = '', days = [], val;
 			this.$('.cli-course-input').each(function() {
 				data.push([
@@ -137,7 +151,7 @@
 				}
 			});
 			days = days.join('-') + '_';
-			url = 'c/' + days + url.substr(0, url.length-1);
+			url = 'c/' + this.page + '_' + days + url.substr(0, url.length-1);
 			MyAppRouter.navigate(url, {trigger: true});
 		},
 		
@@ -183,6 +197,9 @@
 	CourseCollection = Backbone.Collection.extend({
 		model: CourseModel,
 		
+		maxPage: 0,
+		page: 0,
+		
 		//Specify the url where the courses will be fetched
 		url: '/siscode/courses/fetch',
 		
@@ -222,7 +239,7 @@
 		fixSlots: function(col) {
 			var courseSlot, self, color;
 			self = this;
-			_.each(col.models, function(model, key){
+			_.each(col.models, function(model, key) {
 				//Set a color for each CourseModel
 				if(self.colors[key] !== undef) {
 					color = self.colors[key];
@@ -242,6 +259,8 @@
 		//Get the data from the server and create the corresponding models and collections
 		parse: function(response) {
 			var data = [];
+			this.maxPage = response.pagination.total;
+			this.page = response.pagination.page;
 			//The reponse that we get from the server has 'status' and 'content', inside content we have an array that has 'Course' and 'CourseSlot' 
 			_.each(response.content, function(item) {
 				var courseSlotModels = [], modelData;
@@ -265,6 +284,7 @@
 		
 		initialize: function() {
 			this.collection.on('reset', this.addAll, this);
+			this.$('.paginator').html((new PaginationView({collection:this.collection})).render().$el);
 		},
 		
 		addAll: function(col) {
@@ -333,7 +353,41 @@
 		}
 	});
 	
-	//Create the necessary collections and views
+	PaginationView = Backbone.View.extend ({
+		tagName: 'div',
+		
+		events: {
+			'click .next': 'updateUrlNext',
+			'click .previous': 'updateUrlPrevious'
+		},
+		
+		updateUrlNext: function() {
+			MyCourseInputListView.updateUrl(1);
+		},
+		
+		updateUrlPrevious: function() {
+			MyCourseInputListView.updateUrl(-1);
+		},
+		
+		initialize: function() {
+			this.collection.on('reset', this.render, this);
+		},
+		
+		render: function() {
+			var $template, compiled, data;
+			$template = $('#pagination-view-tmpl').html();
+			compiled = H.compile($template);
+			data = {
+				page: this.collection.page,
+				maxPage: this.collection.maxPage
+			};
+			this.$el.html(compiled(data));
+			
+			return this;
+		}
+	});
+
+//Create the necessary collections and views
 	MyCourseCollection = new CourseCollection();
 	MyCourseScheduleView = new CourseScheduleView({collection:MyCourseCollection});
 	
@@ -357,8 +411,11 @@
 			var data = [],
 				models,
 				array,
-				days;
+				days,
+				page;
 			data = d.split('_');
+			page = data.splice(0,1);
+			page = page[0];
 			days = data.splice(0,1);
 			days = days[0].split('-');
 			_.each(data, function(item, key) {
@@ -383,8 +440,9 @@
 			});
 			
 			MyCourseInputListView.updateFilters(days);
-			
+			MyCourseInputListView.page = +page;
 			data = {
+				page: page,
 				course: data,
 				days: days
 			};
