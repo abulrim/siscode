@@ -47,7 +47,7 @@
 	//Course model
 	CourseInputModel = Backbone.Model.extend({
 		defaults: {
-			subject_id: 1,
+			subject_id: null,
 			number: null,
 			crn: null
 		},
@@ -135,7 +135,7 @@
 			} else if (action === 1) {
 				this.page += 1;
 			}
-			this.page = Math.max(1, this.page); 
+			this.page = Math.max(1, this.page);
 			var data = [], url = '', days = [], val;
 			this.$('.cli-course-input').each(function() {
 				data.push([
@@ -283,8 +283,11 @@
 		el: '.schedule',
 		
 		initialize: function() {
+			var self = this;
 			this.collection.on('reset', this.addAll, this);
-			this.$('.paginator').html((new PaginationView({collection:this.collection})).render().$el);
+			this.$('.paginator').each(function() {
+				$(this).html((new PaginationView({collection:self.collection})).render().$el);
+			});
 		},
 		
 		addAll: function(col) {
@@ -362,7 +365,9 @@
 		},
 		
 		updateUrlNext: function() {
-			MyCourseInputListView.updateUrl(1);
+			if (+this.collection.page < +this.collection.maxPage) {
+				MyCourseInputListView.updateUrl(1);
+			}
 		},
 		
 		updateUrlPrevious: function() {
@@ -382,7 +387,17 @@
 				maxPage: this.collection.maxPage
 			};
 			this.$el.html(compiled(data));
-			
+			if (+this.collection.page >= +this.collection.maxPage) {
+				this.$('.next').addClass('disabled');
+			}
+			if (+this.collection.page === 1) {
+				this.$('.previous').addClass('disabled');
+			}
+			if (this.collection.maxPage === 0) {
+				this.$el.hide();
+			} else {
+				this.$el.show();
+			}
 			return this;
 		}
 	});
