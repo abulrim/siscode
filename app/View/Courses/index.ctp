@@ -72,8 +72,8 @@
 			<?php endforeach; ?>
 		</select>
 	</div>
-	<div class="course-floats"><input type="text" class="course-number" name="number" value="{{number}}" placeholder="Number" /></div>
-	<div class="course-floats"><input type="text" class="course-crn" name="crn" value="{{crn}}" placeholder="CRN" /></div>
+	<div class="course-floats"><input type="text" class="course-number course-input" name="number" value="{{number}}" placeholder="Number" /></div>
+	<div class="course-floats"><input type="text" class="course-crn course-input" name="crn" value="{{crn}}" placeholder="CRN" /></div>
 	<div class="course-floats"><span name="remove" class="remove-course"><i class="remove-course-btn"></i></span></div>
 	<div class="clear"></div>
 <?php echo $this->HtmlLogic->endTemplate();?>

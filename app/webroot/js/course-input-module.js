@@ -102,7 +102,14 @@
 		
 		events: {
 			"click #add-course"	: 'addInputModel',
-			"click .cil-submit"	: 'updateUrlEvent'
+			"click .cil-submit"	: 'updateUrlEvent',
+			'keypress .course-input' : 'keyLog'
+		},
+		
+		keyLog: function(e) {
+			if (e.keyCode === 13) {
+				this.updateUrlEvent();
+			}
 		},
 		
 		initialize: function() {
@@ -427,7 +434,9 @@
 				models,
 				array,
 				days,
-				page;
+				page,
+				joinedCourses = [],
+				url;
 			data = d.split('_');
 			page = data.splice(0,1);
 			page = page[0];
@@ -456,18 +465,21 @@
 			
 			MyCourseInputListView.updateFilters(days);
 			MyCourseInputListView.page = +page;
-			data = {
-				page: page,
-				course: data,
-				days: days
-			};
 			
-			MyCourseCollection.fetch({
-				type: 'post',
-				data: {
-					data: data
+			_.each(data, function(course, key) {
+				if (course.crn !== '') {
+					joinedCourses.push('--' + course.crn);
+				} else if (course.subject_id !== '' && course.number !== '') {
+					joinedCourses.push(course.subject_id + '-' + course.number + '-');
 				}
 			});
+			joinedCourses = _.sortBy(joinedCourses, function(item) {
+				return item;
+			});
+			url = page + '_' + days.join('-') + '_' + joinedCourses.join('_') + '.json';
+
+			MyCourseCollection.url = '/siscode/courses/fetch/' + url;
+			MyCourseCollection.fetch();
 		}
 	});
 	MyAppRouter = new AppRouter();

@@ -9,43 +9,105 @@ class CoursesController extends AppController {
 		$this->set(compact('subjects'));
 	}
 	
-	public function fetch() {
-		
+	public function fetch($data) {
 		$courses = array();
-		
+		$inputs = array();
+		$urlData = explode('_', $data);
+		$page = $urlData[0];
+		$days = explode('-', $urlData[1]);
+		$urlData = array_slice($urlData, 2);
+		foreach($urlData as $key => $course) {
+			$exploded = explode('-', $course);
+			$inputs[$key]['subject_id'] = $exploded[0];
+			$inputs[$key]['number'] = $exploded[1];
+			$inputs[$key]['crn'] = $exploded[2];
+		}
+		$implodedDays = implode('-', $days);
 		$daysConditions = array();
-		$daysConditions = $this->_getDaysConditions($this->request->data['days']);
+		$daysConditions = $this->_getDaysConditions($days);
 		
-		$inputs = $this->request->data['course'];
+		//Check if course combinations cached
+		$unsortedCombinedInputs = array();
 		
-		foreach($inputs as $input) {
-			if (empty($input['crn'])) {
-				$conditions = array(
-					'Course.subject_id' => $input['subject_id'],
-					'Course.number' => $input['number']
-				);
+		foreach($inputs as $key => $input) {
+			if (!empty($input['crn'])) {
+				$input['subject_id'] = $input['number'] = '';
+				$inputs[$key] = $input;
+			} 
+			if (empty($input['crn']) && empty($input['subject_id']) && empty($input['number'])) {
+				unset($inputs[$key]);
 			} else {
-				$conditions = array(
-					'Course.crn' => $input['crn']
-				);
-			}
-			$this->Course->contain('CourseSlot');
-			$fetchedCourse = $this->Course->find('all', array(
-				'conditions' => array_merge($daysConditions, $conditions)
-			));
-			if (!empty($fetchedCourse)) {
-				$courses[] = $fetchedCourse;
+				$unsortedCombinedInputs[] = implode('-', $input);
 			}
 		}
 		
-		$combinations = $this->_getCombinations($courses);
-		$count = count($combinations);
-		$page = $this->request->data['page'];
+		$combinedInputs = Hash::sort($unsortedCombinedInputs, '{n}', 'asc');
+		$cacheName = $implodedDays . '_' . implode('_', $combinedInputs);
+		$cache = Cache::read($cacheName);
 		
-		if ($page > $count) {
-			$courses = array();
-		} else {
-			$courses = $combinations[$page - 1];
+		if (!empty($inputs)) {
+			if (!$cache) {
+				$popedInputs = 0;
+				$combinations = array();
+
+				foreach($inputs as $input) {
+					if (empty($input['crn'])) {
+						$conditions = array(
+							'Course.subject_id' => $input['subject_id'],
+							'Course.number' => $input['number']
+						);
+					} else {
+						$conditions = array(
+							'Course.crn' => $input['crn']
+						);
+					}
+
+					$this->Course->contain('CourseSlot');
+					$fetchedCourse = $this->Course->find('all', array(
+						'conditions' => array_merge($daysConditions, $conditions)
+					));
+					if (!empty($fetchedCourse)) {
+						$courses[] = $fetchedCourse;
+					}
+				}
+				$combinations = $this->_getCombinations($courses, $combinations);
+				$combinationsCourseIds = array();
+				foreach($combinations as $combination) {
+					$combinationsCourseIds[] = Hash::extract($combination, '{n}.Course.id');
+				}
+				//Cache only course ids combinations
+				Cache::write($cacheName, $combinationsCourseIds);
+
+				$count = count($combinations);
+
+				if ($page > $count) {
+					$courses = array();
+				} else {
+					$courses = $combinations[$page - 1];
+				}
+			} else {
+				$count = count($cache);
+				if ($page > $count) {
+					$courses = array();
+				} else {
+
+					$courseIds = $cache[$page - 1];
+					$this->Course->contain('CourseSlot');
+					$courses = $this->Course->find('all', array(
+						'conditions' => array(
+							'Course.id' => $courseIds
+						)
+					));
+					$coursesById = array();
+					foreach($courses as $course) {
+						$coursesById[$course['Course']['id']] = $course;
+					}
+					$courses = array();
+					foreach($courseIds as $courseId) {
+						$courses[] = $coursesById[$courseId];
+					}
+				}
+			}
 		}
 		
 		$content = array(
@@ -56,12 +118,21 @@ class CoursesController extends AppController {
 				'page' => $page
 			)
 		);
+		
+		//server caching
+		$fileName = APP . 'webroot' . DS . 'courses' . DS . 'fetch' . DS . $data . '.json';
+		if (file_exists($fileName)) {
+			unlink($fileName);
+		}
+		$openedFile = fopen($fileName, 'w');
+		fwrite($openedFile, json_encode($content));
+		fclose($openedFile);
+		
 		$this->set(compact('content'));
 		$this->set('_serialize', 'content');
 	}
 	
-	protected function _getCombinations($inputs) {
-		$combinations = array();
+	protected function _getCombinations($inputs, $combinations = array()) {
 		
 		foreach($inputs as $input) {
 			$combinations = $this->_checkConflict($combinations, $input);
