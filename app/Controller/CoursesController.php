@@ -45,7 +45,7 @@ class CoursesController extends AppController {
 		$cacheName = $implodedDays . '_' . implode('_', $combinedInputs);
 		$cache = Cache::read($cacheName);
 		
-		if (!empty($inputs)) {
+		if (!empty($inputs) && count($inputs) <= 7) {
 			if (!$cache) {
 				$popedInputs = 0;
 				$combinations = array();
