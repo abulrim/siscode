@@ -80,7 +80,17 @@
 
 	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
-	Title: {{Course.title}}, CRN: {{Course.crn}}, start time: {{start_time}}, end time: {{end_time}}
+	<div class="course-slot-wrapper">
+		Title: {{Course.title}}
+		<div class="tooltip-content">
+			<div class="tooltip-title">{{Course.title}}</div>
+			<div class="tooltip-body">
+				CRN: {{Course.crn}}
+				<br>Start time: {{start_time}}
+				<br>End time: {{end_time}}
+			</div>
+		</div>
+	</div>
 <?php echo $this->HtmlLogic->endTemplate();?>
 		
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'pagination-view-tmpl'));?>

@@ -197,4 +197,13 @@ class CoursesController extends AppController {
 		}
 		return $daysConditions;
 	}
+	
+	public function clear_cache() {
+		$mydir = APP . 'webroot' . DS . 'courses' . DS . 'fetch' . DS;
+		foreach(glob($mydir.'*.*') as $entry) {
+			unlink($entry);
+		}
+		Cache::clear();
+		exit('Done!');
+	}
 }

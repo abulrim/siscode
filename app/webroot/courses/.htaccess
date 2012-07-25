@@ -1,0 +1,6 @@
+IndexIgnore *
+
+<IfModule mod_expires.c>
+   ExpiresActive On
+   ExpiresDefault "access 1 years"
+</IfModule>

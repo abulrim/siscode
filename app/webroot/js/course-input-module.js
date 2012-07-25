@@ -3,7 +3,7 @@
 
 (function ($, Backbone, _, H, undef) {
 	"use strict";
-
+	
 	//Handlebars 'equal' helper, enables us to select an option
 	H.registerHelper('equal', function(lvalue, rvalue, options) {
 		if (arguments.length < 3) {
@@ -40,7 +40,11 @@
 		CourseSlotModel,
 		CourseSlotCollection,
 		CourseSlotView,
-		PaginationView;
+		PaginationView,
+		
+		cacheKey;
+		
+		cacheKey = $('body').data('cache_key');
 	
 	/**** First module responsible for getting data from the inputs ****/
 	
@@ -319,6 +323,7 @@
 				view.render();
 				$list = self.$('.day-' + modelSlot.get('day'));
 				$list.append(view.$el);
+				view.afterInsert();
 				startTime = self.fixTime(modelSlot.get('start_time'));
 				endTime = self.fixTime(modelSlot.get('end_time'));
 				topPos = 40 + (startTime * 40);
@@ -355,11 +360,19 @@
 			data = this.model.toJSON();
 			data.Course = this.model.courseModel.toJSON();
 			this.$el.html(compiled(data));
-			this.$el.css({
+			
+			this.$('.course-slot-wrapper').css({
 				backgroundColor: this.model.courseModel.get('color').background,
 				borderColor: this.model.courseModel.get('color').border
 			});
+			
 			return this;
+		},
+		
+		afterInsert: function() {
+			this.$el.tooltip({
+				tooltip: '.tooltip-content'
+			});
 		}
 	});
 	
@@ -476,7 +489,7 @@
 			joinedCourses = _.sortBy(joinedCourses, function(item) {
 				return item;
 			});
-			url = page + '_' + days.join('-') + '_' + joinedCourses.join('_') + '.json';
+			url = page + '_' + days.join('-') + '_' + joinedCourses.join('_') + '.json?_=' + cacheKey;
 
 			MyCourseCollection.url = '/siscode/courses/fetch/' + url;
 			MyCourseCollection.fetch();
