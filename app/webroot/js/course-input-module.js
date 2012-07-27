@@ -107,7 +107,7 @@
 		},
 		
 		crnKeyUp: function(event) {
-			if(this.$(event.srcElement).val().length > 0) {
+			if(this.$(event.target).val().length > 0) {
 				this.$('select').prop('disabled',true).trigger('liszt:updated');
 			} else {
 				this.$('select').prop('disabled',false).trigger('liszt:updated');
@@ -437,8 +437,10 @@
 			compiled = H.compile($template);
 			data = this.model.toJSON();
 			data.Course = this.model.courseModel.toJSON();
+			data.start_time = data.start_time.substr(0, 5);
+			data.end_time = data.end_time.substr(0, 5);
+			data.Course.subject_code = MySubjectCollection.get(data.Course.subject_id).get("code");
 			this.$el.html(compiled(data));
-			
 			this.$('.course-slot-wrapper').css({
 				backgroundColor: this.model.courseModel.get('color').background,
 				borderColor: this.model.courseModel.get('color').border
@@ -500,7 +502,7 @@
 		}
 	});
 
-//Create the necessary collections and views
+	//Create the necessary collections and views
 	MyCourseCollection = new CourseCollection();
 	MyCourseScheduleView = new CourseScheduleView({collection:MyCourseCollection});
 	/***** End of the second module ****/

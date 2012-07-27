@@ -76,7 +76,6 @@
 	<div class="course-floats">
 		<select name="number" class="course-number" data-placeholder="Number">
 		</select>
-<!--		<input type="text" class="course-number course-input" name="number" value="{{number}}" placeholder="Number" />-->
 	</div>
 	<div class="course-floats"><input type="text" class="course-crn course-input" name="crn" value="{{crn}}" placeholder="CRN" /></div>
 	<div class="course-floats"><span name="remove" class="remove-course"><i class="remove-course-btn"></i></span></div>
@@ -92,11 +91,12 @@
 	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
 	<div class="course-slot-wrapper">
-		Title: {{Course.title}}
+		<div class="course-slot-main">{{Course.subject_code}} {{Course.number}}</div>
 		<div class="tooltip-content">
 			<div class="tooltip-title">{{Course.title}}</div>
 			<div class="tooltip-body">
 				CRN: {{Course.crn}}
+				<br>Instructor: {{Instructor.firstname}} {{Instructor.surname}}
 				<br>Start time: {{start_time}}
 				<br>End time: {{end_time}}
 			</div>
