@@ -6,3 +6,4 @@
 .DS_Store
 /tags
 /app/webroot/courses/fetch/
+/node_modules/.bin/

@@ -3,9 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>SIScode</title>
-	<link rel="stylesheet/less" type="text/css" href="<?php echo $this->request->webroot . 'css/style.less' ?>">
 	<?php echo $this->HtmlLogic->css('chosen'); ?>
-	<?php echo $this->HtmlLogic->script('less-1.3.0.min'); ?>
+	<?php echo $this->HtmlLogic->less('style', 'less-1.3.0.min');?>
 	<!--[if lt IE 9]>
 		<?php echo $this->HtmlLogic->script('html5shiv');?>
 	<![endif]-->
