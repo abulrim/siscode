@@ -13,11 +13,14 @@
 <body data-cache_key="6">
 	<?php echo $this->fetch('content'); ?>
 	<?php echo $this->HtmlLogic->script('jquery-1.7.2.min'); ?>
-	<?php echo $this->HtmlLogic->script('jquery.tooltip'); ?>
-	<?php echo $this->HtmlLogic->script('underscore-min'); ?>
-	<?php echo $this->HtmlLogic->script('chosen.jquery.min'); ?>
-	<?php echo $this->HtmlLogic->script('handlebars-1.0.0.beta.6'); ?>
-	<?php echo $this->HtmlLogic->script('backbone-min'); ?>
-	<?php echo $this->HtmlLogic->script('course-input-module'); ?>
+	
+	<?php echo $this->HtmlLogic->script(array(
+		'jquery.tooltip',
+		'underscore-min',
+		'chosen.jquery.min',
+		'handlebars-1.0.0.beta.6',
+		'backbone-min',
+		'course-input-module'
+	), array('combined' => true));?>
 </body>
 </html>
