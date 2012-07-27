@@ -27,6 +27,11 @@
 		MyCourseInputView,
 		AppRouter,
 		MyAppRouter,
+		SubjectModel,
+		SubjectCollection,
+		subjects,
+		MySubjectCollection,
+		SubjectListView,
 		
 		CourseModel,
 		MyCourseModel,
@@ -47,6 +52,33 @@
 		cacheKey = $('body').data('cache_key');
 	
 	/**** First module responsible for getting data from the inputs ****/
+	SubjectModel = Backbone.Model.extend({
+		
+	});
+	
+	SubjectCollection = Backbone.Collection.extend({
+		model: SubjectModel
+	});
+	
+	SubjectListView = Backbone.View.extend({
+			template: H.compile($('#course-input-subjects').html()),
+			
+			initialize: function() {
+				this.$el.on('change', function() {
+					console.log('Change!!!');
+				});
+			},
+			
+			render: function() {
+				var subjects = [];
+				_.each(this.collection.models, function(model) {
+					subjects.push(model.toJSON());
+				});
+				this.$el.html(this.template({subjects: subjects}))
+				.val(this.options.selected_id);
+				return this;
+			}
+	});
 	
 	//Course model
 	CourseInputModel = Backbone.Model.extend({
@@ -65,14 +97,53 @@
 	CourseInputView = Backbone.View.extend({
 		tagName: 'div',
 		className: 'cli-course-input',
+		template: H.compile($('#course-input-tmpl').html()),
+		numberTemplate: H.compile($('#course-input-numbers').html()),
+		
+		events: {
+			'change select[name=subject_id]':'fillNumber',
+			'click .remove-course' : 'removeCourse',
+			'keyup .course-crn' : 'crnKeyUp'
+		},
+		
+		crnKeyUp: function(event) {
+			if(this.$(event.srcElement).val().length > 0) {
+				this.$('select').prop('disabled',true).trigger('liszt:updated');
+			} else {
+				this.$('select').prop('disabled',false).trigger('liszt:updated');
+			}
+		},
+		
+		fillNumber: function() {
+			var modelId,
+				numbers,
+				selectedModel;
+			modelId = this.$('select[name=subject_id]').val();
+			if (modelId) {
+				selectedModel = MySubjectCollection.get(modelId).toJSON();	
+			} else {
+				selectedModel = {numbers:[]};
+			}
+			this.$('select[name=number]').html(this.numberTemplate(selectedModel))
+			.trigger('liszt:updated');
+			
+		},
 		
 		render: function() {
-			var $tmpl, 
-				compiled;
-			$tmpl = $('#course-input-tmpl');
-			compiled = H.compile($tmpl.html());
-			this.$el.html(compiled(this.model.toJSON()));
-			
+			var view,
+				subjects = [],
+				data;
+			data = this.model.toJSON();
+			_.each(MySubjectCollection.models, function(model) {
+				subjects.push(model.toJSON());
+			});
+			data.subjects = subjects;
+			this.$el.html(this.template(data))
+			.find('select[name=subject_id]').val(this.model.get('subject_id')).trigger('change')
+			.end()
+			.find('select[name=number]').val(this.model.get('number'));
+
+
 			return this;
 		},
 		
@@ -86,10 +157,6 @@
 		
 		removeCourse: function() {
 			this.model.clear();
-		},
-		
-		events: {
-			'click .remove-course' : 'removeCourse'
 		}
 	});
 
@@ -150,7 +217,7 @@
 			var data = [], url = '', days = [], val;
 			this.$('.cli-course-input').each(function() {
 				data.push([
-					$(this).find('select[name=subject_id]').val(),$(this).find('input[name=number]').val(),$(this).find('input[name=crn]').val()
+					$(this).find('select[name=subject_id]').val(),$(this).find('select[name=number]').val(),$(this).find('input[name=crn]').val()
 				]);
 			});
 			_.each(data, function(item) {
@@ -163,6 +230,7 @@
 			});
 			days = days.join('-') + '_';
 			url = 'c/' + this.page + '_' + days + url.substr(0, url.length-1);
+			
 			MyAppRouter.navigate(url, {trigger: true});
 		},
 		
@@ -180,10 +248,12 @@
 	});
 	
 	
-	//Create the necessary models and views
+	//Create the necessary models and views	
+	subjects = $('#subjects-data').data('subjects');
+	MySubjectCollection = new SubjectCollection();
+	MySubjectCollection.reset(subjects);
 	MyCourseInputCollection = new CourseInputCollection();
 	MyCourseInputListView = new CourseInputListView({collection:MyCourseInputCollection});
-	
 	
 	/**** End of First Module ****/
 	
@@ -299,6 +369,14 @@
 			this.$('.paginator').each(function() {
 				$(this).html((new PaginationView({collection:self.collection})).render().$el);
 			});
+		},
+		
+		loading: function(show) {
+			if (show) {
+				this.$('.loader').show();
+			} else {
+				this.$('.loader').hide();
+			}
 		},
 		
 		addAll: function(col) {
@@ -425,7 +503,6 @@
 //Create the necessary collections and views
 	MyCourseCollection = new CourseCollection();
 	MyCourseScheduleView = new CourseScheduleView({collection:MyCourseCollection});
-	
 	/***** End of the second module ****/
 	
 	/**********************************************************************/
@@ -492,7 +569,13 @@
 			url = page + '_' + days.join('-') + '_' + joinedCourses.join('_') + '.json?_=' + cacheKey;
 
 			MyCourseCollection.url = '/siscode/courses/fetch/' + url;
-			MyCourseCollection.fetch();
+			MyCourseScheduleView.loading(true);
+			MyCourseCollection.reset();
+			MyCourseCollection.fetch({
+				complete: function() {
+					MyCourseScheduleView.loading(false);
+				}
+			});
 		}
 	});
 	MyAppRouter = new AppRouter();

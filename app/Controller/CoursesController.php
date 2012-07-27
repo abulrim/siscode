@@ -1,15 +1,34 @@
 <?php
 class CoursesController extends AppController {
 	public function index() {
+		$this->Course->Subject->contain(array(
+			'Course' => array(
+				'fields' => array('DISTINCT Course.number')
+			)
+		));
 		$subjects = $this->Course->Subject->find('all', array(
 			'order' => array(
 				'Subject.name' => 'ASC'
 			)
 		));
+		$cleanedSubjects = array();
+		foreach($subjects as $subject) {
+			$cleanedSubject = array(
+				'id' => $subject['Subject']['id'],
+				'name' => $subject['Subject']['name'],
+				'numbers' => array()
+			);
+			foreach($subject['Course'] as $courseNumber) {
+				$cleanedSubject['numbers'][] = $courseNumber['number'];
+			}
+			$cleanedSubjects[] = $cleanedSubject;
+		}
+		$subjects = $cleanedSubjects;
 		$this->set(compact('subjects'));
 	}
 	
 	public function fetch($data) {
+		sleep(2);
 		$courses = array();
 		$inputs = array();
 		$urlData = explode('_', $data);

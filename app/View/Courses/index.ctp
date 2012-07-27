@@ -24,7 +24,7 @@
 	</section>
 
 	<section class="schedule">
-		
+		<div class="loader"></div>
 		<div class="schedule-header">
 			<ul class="weekdays">
 				<li></li>
@@ -63,21 +63,32 @@
 		<div class="paginator"></div>
 	</section>
 </div>
+
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>
 	<div class="course-floats">
 		<select name="subject_id" class="course-subject" data-placeholder="Select a Subject">
 			<option value=''></option>
-			<?php foreach($subjects as $subject): ?>
-				<option {{#equal subject_id <?php echo $subject['Subject']['id'];?>}}selected{{/equal}} value="<?php echo $subject['Subject']['id']; ?>"><?php echo $subject['Subject']['name']; ?></option>
-			<?php endforeach; ?>
+			{{#each subjects}}
+				<option value="{{this.id}}">{{this.name}}</option>
+			{{/each}}
 		</select>
 	</div>
-	<div class="course-floats"><input type="text" class="course-number course-input" name="number" value="{{number}}" placeholder="Number" /></div>
+	<div class="course-floats">
+		<select name="number" class="course-number" data-placeholder="Number">
+		</select>
+<!--		<input type="text" class="course-number course-input" name="number" value="{{number}}" placeholder="Number" />-->
+	</div>
 	<div class="course-floats"><input type="text" class="course-crn course-input" name="crn" value="{{crn}}" placeholder="CRN" /></div>
 	<div class="course-floats"><span name="remove" class="remove-course"><i class="remove-course-btn"></i></span></div>
 	<div class="clear"></div>
-<?php echo $this->HtmlLogic->endTemplate();?>
-
+<?php echo $this->HtmlLogic->endTemplate(); ?>
+	
+<?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-numbers')); ?>
+	<option value=''></option>
+	{{#each numbers}}
+		<option value="{{this}}">{{this}}</option>
+	{{/each}}
+<?php echo $this->HtmlLogic->endTemplate(); ?>
 	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
 	<div class="course-slot-wrapper">
@@ -99,4 +110,5 @@
 	<div class="paginator-text">{{page}}/{{maxPage}}</div>
 	<div class="clear"></div>
 <?php echo $this->HtmlLogic->endTemplate();?>
-	
+
+<div id="subjects-data" data-subjects='<?php echo json_encode($subjects); ?>'></div>

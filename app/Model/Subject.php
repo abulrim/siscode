@@ -12,5 +12,9 @@ class Subject extends AppModel {
  * @var string
  */
 	public $displayField = 'name';
+	
+	public $hasMany = array(
+		'Course'
+	);
 
 }
