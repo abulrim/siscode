@@ -47,6 +47,13 @@
 		CourseSlotView,
 		PaginationView,
 		
+		SavedModel,
+		SavedView,
+		SavedCollection,
+		SavedCollectionView,
+		MySavedCollection,
+		MySavedCollectionView,
+		
 		cacheKey;
 		
 		cacheKey = $('body').data('cache_key');
@@ -198,7 +205,6 @@
 		
 		addInputModel: function() {
 			this.collection.add(new CourseInputModel());
-			
 		},
 		
 		updateUrlEvent: function(){
@@ -350,6 +356,7 @@
 					courseSlotModels.push(new CourseSlotModel(courseSlotData));
 				});
 				//inside modelData put the Course info and the CourseSlot as a collection
+				item.Course.subject_code = MySubjectCollection.get(item.Course.subject_id).get("code");
 				modelData = item.Course;
 				modelData.CourseSlot = new CourseSlotCollection(courseSlotModels);
 				//Store all the model data inside 'data' variable that will be returned later
@@ -439,7 +446,6 @@
 			data.Course = this.model.courseModel.toJSON();
 			data.start_time = data.start_time.substr(0, 5);
 			data.end_time = data.end_time.substr(0, 5);
-			data.Course.subject_code = MySubjectCollection.get(data.Course.subject_id).get("code");
 			this.$el.html(compiled(data));
 			this.$('.course-slot-wrapper').css({
 				backgroundColor: this.model.courseModel.get('color').background,
@@ -509,9 +515,96 @@
 	
 	/**********************************************************************/
 	
+	/**** third module  ****/
+	
+	SavedModel = Backbone.Model.extend({
+		defaults: {
+			url: null
+		}
+	});
+	
+	SavedView = Backbone.View.extend({
+		tagName: 'li',
+		
+		events: {
+			'click': 'goToSavedUrl'
+		},
+		
+		goToSavedUrl: function() {
+			MyAppRouter.navigate('c/' + this.model.get("url"), {trigger: true});
+		},
+		
+		initialize: function() {
+		},
+		
+		render: function() {
+			var link = '';
+			
+			_.each(MyCourseCollection.models, function(model) {
+				link = link + model.get("crn") + ' (' + model.get("subject_code") + ' ' + model.get("number") + ')' + ' - ';
+			});
+			
+			link = link + '(page: ' + MyCourseInputListView.page + ')';
+			this.$el.html(link);
+			return this;
+		}
+	});
+	
+	SavedCollection = Backbone.Collection.extend({
+		model: SavedModel
+	});
+	
+	SavedCollectionView = Backbone.View.extend({
+		el: '.foot-bar',
+		toggled: false,
+		
+		events: {
+			'click .foot-bar-arrow': 'toggleFoot',
+			'click .foot-bar-add': 'save'
+		},
+		
+		initialize: function() {
+			this.collection.on('add', this.addSaved, this);
+		},
+		
+		addSaved: function(model) {
+			var view, $viewEl;
+			view = new SavedView({model:model});
+			view.render();
+			$viewEl = view.$el;
+			this.$('.foot-bar-combination').append($viewEl);
+		},
+		
+		toggleFoot: function(event) {
+			if (this.toggled === false) {
+				this.$el.css('bottom', '0px');
+				this.$(event.target).addClass('down');
+				this.toggled = true;
+			} else {
+				this.$el.css('bottom', -(this.$el.height() - 40) + 'px');
+				this.$(event.target).removeClass('down');
+				this.toggled = false;
+			}
+		},
+		
+		save: function() {
+			if (this.collection.where({url: MyAppRouter.url}).length === 0 && MyAppRouter.url.length !== 0) {
+				this.collection.add(new SavedModel({url: MyAppRouter.url}));
+			}
+		}
+	});
+	
+	MySavedCollection = new SavedCollection();
+	MySavedCollectionView = new SavedCollectionView({collection:MySavedCollection});
+	/***** End of the third module ****/
+	
+	/**********************************************************************/
+	
 	/**** Router module common to both modules  ****/
 	
 	AppRouter = Backbone.Router.extend({
+		url: '',
+		
 		routes: {
 			'': 'index',
 			'c/:d': 'fillCourseInput'
@@ -542,6 +635,8 @@
 					crn: array[2]
 				};
 			});
+			
+			this.url = d;
 			
 			models = [];
 			_.each(MyCourseInputCollection.models, function(model) {

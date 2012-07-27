@@ -238,10 +238,8 @@ input {
 	margin: 0 2px;
 	padding: 0 3px;
 	height: 100%;
-	text-align: center;
 }
 .course-slot-main {
-	margin-top: 6px;
 }
 .filters {
 	font-size: 12px;
@@ -399,3 +397,71 @@ input {
 	margin: -16px 0 0 -16px;
 	background: url('../img/loader.gif') no-repeat;
 }
+
+/*foot-bar CSS */
+.foot-bar {
+	position: fixed;
+	bottom: -260px;
+	height: 300px;
+	width: 900px;
+	background-color: #DDD;
+	left: 50%;
+	margin-left: -450px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	-webkit-transition: bottom 500ms;
+	border: solid thin #BBB;
+	-webkit-box-shadow: 0px 0px 10px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px rgba(50, 50, 50, 0.75);
+}
+.foot-bar-top {
+	position: relative;
+	height: 40px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	background-color: #EEE;
+	background-repeat: repeat-x;
+	background-image: -moz-linear-gradient(top, whiteSmoke 0%, #EEE 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,whiteSmoke), color-stop(100%,#EEE));
+	background-image: -webkit-linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	background-image: -ms-linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	background-image: -o-linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
+	background-image: linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	border-bottom: solid thin #BBB;
+}
+.foot-bar-arrow {
+	float: left;
+	.icon;
+  background-position: -288px -120px;
+}
+.foot-bar-arrow.down {
+  background-position: -313px -119px;
+}
+.foot-bar-add {
+	float: right;
+	.icon;
+  background-position: 0 -96px;
+}
+.foot-bar-combination {
+	padding: 10px;
+	list-style-position: inside;
+	font-size: 14px;
+}
+.foot-bar-combination li {
+	cursor: pointer;
+}
+.icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+	margin: 13px;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url("../img/glyphicons-halflings.png");
+  background-position: 14px 14px;
+  background-repeat: no-repeat;
+	cursor: pointer;
+}
+/* End of foot-bar CSS */

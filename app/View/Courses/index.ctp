@@ -63,7 +63,16 @@
 		<div class="paginator"></div>
 	</section>
 </div>
-
+<div class="foot-bar">
+	<div class="foot-bar-top">
+		<i class="foot-bar-arrow"></i>
+		<i class="foot-bar-add"></i>
+	</div>
+	<div class="foot-bar-content">
+		<ul class="foot-bar-combination">
+		</ul>
+	</div>
+</div>
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>
 	<div class="course-floats">
 		<select name="subject_id" class="course-subject" data-placeholder="Select a Subject">
@@ -91,14 +100,13 @@
 	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
 	<div class="course-slot-wrapper">
-		<div class="course-slot-main">{{Course.subject_code}} {{Course.number}}</div>
+		{{start_time}} - {{end_time}}
+		<br>{{Course.subject_code}} {{Course.number}}
 		<div class="tooltip-content">
 			<div class="tooltip-title">{{Course.title}}</div>
 			<div class="tooltip-body">
 				CRN: {{Course.crn}}
 				<br>Instructor: {{Instructor.firstname}} {{Instructor.surname}}
-				<br>Start time: {{start_time}}
-				<br>End time: {{end_time}}
 			</div>
 		</div>
 	</div>
