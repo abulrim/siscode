@@ -197,7 +197,6 @@ class HtmlLogicHelper extends AppHelper{
 				}
 			} 
 			if (!$keep) {
-				FireCake::log('generate');
 				$handle = fopen($combinedFileName, 'w');
 				fwrite($fhandle, '');
 				fclose($handle);
@@ -207,7 +206,7 @@ class HtmlLogicHelper extends AppHelper{
 					$currentHandle = fopen($completeFileName, 'r');
 					$content = fread($currentHandle, filesize($completeFileName));
 					fclose($currentHandle);
-					fwrite($handle, $content);
+					fwrite($handle, $content . "\n");
 				}
 				fclose($handle);
 			}

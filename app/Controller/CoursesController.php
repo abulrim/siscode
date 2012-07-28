@@ -25,7 +25,6 @@ class CoursesController extends AppController {
 			$cleanedSubjects[] = $cleanedSubject;
 		}
 		$subjects = $cleanedSubjects;
-		FireCake::log($subjects);
 		$this->set(compact('subjects'));
 	}
 	
