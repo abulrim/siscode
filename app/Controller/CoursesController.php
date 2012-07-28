@@ -16,6 +16,7 @@ class CoursesController extends AppController {
 			$cleanedSubject = array(
 				'id' => $subject['Subject']['id'],
 				'name' => $subject['Subject']['name'],
+				'code' => $subject['Subject']['code'],
 				'numbers' => array()
 			);
 			foreach($subject['Course'] as $courseNumber) {
@@ -24,11 +25,11 @@ class CoursesController extends AppController {
 			$cleanedSubjects[] = $cleanedSubject;
 		}
 		$subjects = $cleanedSubjects;
+		FireCake::log($subjects);
 		$this->set(compact('subjects'));
 	}
 	
 	public function fetch($data) {
-		sleep(2);
 		$courses = array();
 		$inputs = array();
 		$urlData = explode('_', $data);
@@ -81,7 +82,11 @@ class CoursesController extends AppController {
 						);
 					}
 
-					$this->Course->contain('CourseSlot');
+					$this->Course->contain(array(
+						'CourseSlot' => array(
+							'Instructor'
+						)
+					));
 					$fetchedCourse = $this->Course->find('all', array(
 						'conditions' => array_merge($daysConditions, $conditions)
 					));
@@ -111,7 +116,11 @@ class CoursesController extends AppController {
 				} else {
 
 					$courseIds = $cache[$page - 1];
-					$this->Course->contain('CourseSlot');
+					$this->Course->contain(array(
+						'CourseSlot' => array(
+							'Instructor'
+						)
+					));
 					$courses = $this->Course->find('all', array(
 						'conditions' => array(
 							'Course.id' => $courseIds
@@ -128,7 +137,6 @@ class CoursesController extends AppController {
 				}
 			}
 		}
-		
 		$content = array(
 			'status' => 'success',
 			'content' => $courses,

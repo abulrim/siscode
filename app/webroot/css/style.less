@@ -239,6 +239,8 @@ input {
 	padding: 0 3px;
 	height: 100%;
 }
+.course-slot-main {
+}
 .filters {
 	font-size: 12px;
 	margin: 20px 0 15px 0;
@@ -375,6 +377,7 @@ input {
 }
 .tooltip-body {
 	padding: 5px;
+	text-align: left;
 }
 .transition {
 	-webkit-transition: opacity 300ms;
@@ -394,3 +397,92 @@ input {
 	margin: -16px 0 0 -16px;
 	background: url('../img/loader.gif') no-repeat;
 }
+
+/*foot-bar CSS */
+.foot-bar {
+	z-index: 10;
+	position: fixed;
+	bottom: -260px;
+	height: 300px;
+	width: 900px;
+	background-color: #EEE;
+	left: 50%;
+	margin-left: -450px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	-webkit-transition: bottom 500ms;
+	border: solid thin #BBB;
+	-webkit-box-shadow: 0px 0px 10px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px rgba(50, 50, 50, 0.75);
+}
+.foot-bar-top {
+	position: relative;
+	height: 40px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	background-color: #EEE;
+	background-repeat: repeat-x;
+	background-image: -moz-linear-gradient(top, whiteSmoke 0%, #EEE 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,whiteSmoke), color-stop(100%,#EEE));
+	background-image: -webkit-linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	background-image: -ms-linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	background-image: -o-linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
+	background-image: linear-gradient(top, whiteSmoke 0%,#EEE 100%);
+	border-bottom: solid thin #BBB;
+}
+.foot-bar-arrow {
+	float: left;
+	.icon;
+  background-position: -288px -120px;
+}
+.foot-bar-arrow.down {
+  background-position: -313px -119px;
+}
+.foot-bar-add {
+	float: right;
+	.icon;
+  background-position: 0 -96px;
+}
+.foot-bar-combination {
+	padding: 15px;
+	list-style-position: inside;
+	list-style: none;
+	font-size: 13px;
+}
+.foot-bar-combination li {
+	cursor: pointer;
+	padding: 10px 0 10px 10px;
+	border-top: solid thin #999;
+}
+.foot-bar-combination li:first-child {
+	border-top: none;
+	padding-top: 0;
+}
+.foot-bar-content {
+	overflow-y: scroll;
+	height: 260px;
+}
+.foot-bar-remove {
+	.icon;
+	margin: 3px 0 0 8px;
+  background-position: -24px -96px;
+	opacity: 0.6;
+}
+.foot-bar-remove:hover {
+	opacity: 1;
+}
+.icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+	margin: 13px;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url("../img/glyphicons-halflings.png");
+  background-position: 14px 14px;
+  background-repeat: no-repeat;
+	cursor: pointer;
+}
+/* End of foot-bar CSS */

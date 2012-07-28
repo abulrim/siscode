@@ -1,7 +1,7 @@
 /*jslint browser:true,devel:true,white:true,nomen:true,bad_new:true*/
 /*globals jQuery,Backbone,Handlebars,_, undefined*/ 
 
-(function ($, Backbone, _, H, undef) {
+(function ($, Backbone, _, H, amplify, undef) {
 	"use strict";
 	
 	//Handlebars 'equal' helper, enables us to select an option
@@ -47,8 +47,17 @@
 		CourseSlotView,
 		PaginationView,
 		
-		cacheKey;
+		SavedModel,
+		SavedView,
+		SavedCollection,
+		SavedCollectionView,
+		MySavedCollection,
+		MySavedCollectionView,
 		
+		cacheKey,
+		webroot;
+		
+		webroot = $('body').data('webroot');
 		cacheKey = $('body').data('cache_key');
 	
 	/**** First module responsible for getting data from the inputs ****/
@@ -107,7 +116,7 @@
 		},
 		
 		crnKeyUp: function(event) {
-			if(this.$(event.srcElement).val().length > 0) {
+			if(this.$(event.target).val().length > 0) {
 				this.$('select').prop('disabled',true).trigger('liszt:updated');
 			} else {
 				this.$('select').prop('disabled',false).trigger('liszt:updated');
@@ -198,7 +207,6 @@
 		
 		addInputModel: function() {
 			this.collection.add(new CourseInputModel());
-			
 		},
 		
 		updateUrlEvent: function(){
@@ -282,7 +290,7 @@
 		page: 0,
 		
 		//Specify the url where the courses will be fetched
-		url: '/siscode/courses/fetch',
+		url: webroot + 'courses/fetch',
 		
 		//Each course has a specific color
 		colors: [
@@ -350,6 +358,7 @@
 					courseSlotModels.push(new CourseSlotModel(courseSlotData));
 				});
 				//inside modelData put the Course info and the CourseSlot as a collection
+				item.Course.subject_code = MySubjectCollection.get(item.Course.subject_id).get("code");
 				modelData = item.Course;
 				modelData.CourseSlot = new CourseSlotCollection(courseSlotModels);
 				//Store all the model data inside 'data' variable that will be returned later
@@ -437,8 +446,9 @@
 			compiled = H.compile($template);
 			data = this.model.toJSON();
 			data.Course = this.model.courseModel.toJSON();
+			data.start_time = data.start_time.substr(0, 5);
+			data.end_time = data.end_time.substr(0, 5);
 			this.$el.html(compiled(data));
-			
 			this.$('.course-slot-wrapper').css({
 				backgroundColor: this.model.courseModel.get('color').background,
 				borderColor: this.model.courseModel.get('color').border
@@ -500,16 +510,146 @@
 		}
 	});
 
-//Create the necessary collections and views
+	//Create the necessary collections and views
 	MyCourseCollection = new CourseCollection();
 	MyCourseScheduleView = new CourseScheduleView({collection:MyCourseCollection});
 	/***** End of the second module ****/
 	
 	/**********************************************************************/
 	
+	/**** third module  ****/
+	SavedModel = Backbone.Model.extend({
+		defaults: {
+			url: null,
+			name: null
+		},
+		
+		sync: function(method, model, options) {
+			var combinations;
+			if (method === 'create') {
+				combinations = amplify.store( "savedCombinations");
+				if (!combinations) {
+					combinations = [];
+				}
+				combinations.push(this.toJSON());
+				amplify.store("savedCombinations", combinations);
+			} else if(method === 'delete') {
+				console.log('aaaa');
+			}
+		}
+	});
+	
+	SavedView = Backbone.View.extend({
+		tagName: 'li',
+		
+		$template: H.compile($('#foot-bar-combination-tmpl').html()),
+		events: {
+			'click': 'goToSavedUrl',
+			'click .foot-bar-remove': 'removeCombination'
+		},
+		
+		removeCombination: function() {
+			//console.log(this.collection);
+			return false;
+		},
+		
+		goToSavedUrl: function() {
+			MyAppRouter.navigate('c/' + this.model.get("url"), {trigger: true});
+		},
+		
+		initialize: function() {
+		},
+		
+		render: function() {
+			var data;
+			data = {
+				name: this.model.get("name")
+			};
+			this.$el.html(this.$template(data));
+			return this;
+		}
+	});
+	
+	SavedCollection = Backbone.Collection.extend({
+		model: SavedModel,
+		
+		sync: function(method, collection, options) {
+			if (method === 'read') {
+				var savedCombinations;
+				savedCombinations = amplify.store( "savedCombinations");
+				options.success(savedCombinations);
+			}
+		}
+	});
+	
+	SavedCollectionView = Backbone.View.extend({
+		el: '.foot-bar',
+		toggled: false,
+		
+		events: {
+			'click .foot-bar-arrow': 'toggleFoot',
+			'click .foot-bar-add': 'save'
+		},
+		
+		initialize: function() {
+			this.collection.on('add', this.addSaved, this);
+			this.collection.on('reset', this.addAll, this);
+		},
+		
+		addAll: function(collection) {
+			var self;
+			self = this;
+			_.each(collection.models, function(model) {
+				self.addSaved(model);
+			});
+		},
+		
+		addSaved: function(model) {
+			var view, $viewEl;
+			view = new SavedView({model:model});
+			view.render();
+			$viewEl = view.$el;
+			this.$('.foot-bar-combination').append($viewEl);
+		},
+		
+		toggleFoot: function(event) {
+			if (this.toggled === false) {
+				this.$el.css('bottom', '0px');
+				this.$(event.target).addClass('down');
+				this.toggled = true;
+			} else {
+				this.$el.css('bottom', -(this.$el.height() - 40) + 'px');
+				this.$(event.target).removeClass('down');
+				this.toggled = false;
+			}
+		},
+		
+		save: function() {
+			if (this.collection.where({url: MyAppRouter.url}).length === 0 && MyAppRouter.url.length !== 0) {
+				var link = '';
+			
+				_.each(MyCourseCollection.models, function(model) {
+					link = link + model.get("crn") + ' (' + model.get("subject_code") + ' ' + model.get("number") + ')' + ' - ';
+				});
+				link = link + '(page: ' + MyCourseInputListView.page + ')';
+				
+				this.collection.create({url: MyAppRouter.url, name: link});
+			}
+		}
+	});
+	
+	MySavedCollection = new SavedCollection();
+	MySavedCollectionView = new SavedCollectionView({collection:MySavedCollection});
+	MySavedCollection.fetch();
+	/***** End of the third module ****/
+	
+	/**********************************************************************/
+	
 	/**** Router module common to both modules  ****/
 	
 	AppRouter = Backbone.Router.extend({
+		url: '',
+		
 		routes: {
 			'': 'index',
 			'c/:d': 'fillCourseInput'
@@ -541,6 +681,8 @@
 				};
 			});
 			
+			this.url = d;
+			
 			models = [];
 			_.each(MyCourseInputCollection.models, function(model) {
 				models.push(model);
@@ -568,7 +710,7 @@
 			});
 			url = page + '_' + days.join('-') + '_' + joinedCourses.join('_') + '.json?_=' + cacheKey;
 
-			MyCourseCollection.url = '/siscode/courses/fetch/' + url;
+			MyCourseCollection.url = webroot + 'courses/fetch/' + url;
 			MyCourseScheduleView.loading(true);
 			MyCourseCollection.reset();
 			MyCourseCollection.fetch({
@@ -580,8 +722,8 @@
 	});
 	MyAppRouter = new AppRouter();
 	
-	Backbone.history.start({pushState: true, root: '/siscode/'});
+	Backbone.history.start({pushState: true, root: webroot});
 
 	/**** End of Router Module ****/
 	
-}(jQuery, Backbone, _, Handlebars));
+}(jQuery, Backbone, _, Handlebars, amplify));
