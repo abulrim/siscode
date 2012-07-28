@@ -30,7 +30,6 @@ class CoursesController extends AppController {
 	}
 	
 	public function fetch($data) {
-		sleep(1);
 		$courses = array();
 		$inputs = array();
 		$urlData = explode('_', $data);

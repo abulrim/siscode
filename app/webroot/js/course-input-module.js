@@ -1,7 +1,7 @@
 /*jslint browser:true,devel:true,white:true,nomen:true,bad_new:true*/
 /*globals jQuery,Backbone,Handlebars,_, undefined*/ 
 
-(function ($, Backbone, _, H, undef) {
+(function ($, Backbone, _, H, amplify, undef) {
 	"use strict";
 	
 	//Handlebars 'equal' helper, enables us to select an option
@@ -54,8 +54,10 @@
 		MySavedCollection,
 		MySavedCollectionView,
 		
-		cacheKey;
+		cacheKey,
+		webroot;
 		
+		webroot = $('body').data('webroot');
 		cacheKey = $('body').data('cache_key');
 	
 	/**** First module responsible for getting data from the inputs ****/
@@ -288,7 +290,7 @@
 		page: 0,
 		
 		//Specify the url where the courses will be fetched
-		url: '/siscode/courses/fetch',
+		url: webroot + 'courses/fetch',
 		
 		//Each course has a specific color
 		colors: [
@@ -516,18 +518,39 @@
 	/**********************************************************************/
 	
 	/**** third module  ****/
-	
 	SavedModel = Backbone.Model.extend({
 		defaults: {
-			url: null
+			url: null,
+			name: null
+		},
+		
+		sync: function(method, model, options) {
+			var combinations;
+			if (method === 'create') {
+				combinations = amplify.store( "savedCombinations");
+				if (!combinations) {
+					combinations = [];
+				}
+				combinations.push(this.toJSON());
+				amplify.store("savedCombinations", combinations);
+			} else if(method === 'delete') {
+				console.log('aaaa');
+			}
 		}
 	});
 	
 	SavedView = Backbone.View.extend({
 		tagName: 'li',
 		
+		$template: H.compile($('#foot-bar-combination-tmpl').html()),
 		events: {
-			'click': 'goToSavedUrl'
+			'click': 'goToSavedUrl',
+			'click .foot-bar-remove': 'removeCombination'
+		},
+		
+		removeCombination: function() {
+			//console.log(this.collection);
+			return false;
 		},
 		
 		goToSavedUrl: function() {
@@ -538,20 +561,25 @@
 		},
 		
 		render: function() {
-			var link = '';
-			
-			_.each(MyCourseCollection.models, function(model) {
-				link = link + model.get("crn") + ' (' + model.get("subject_code") + ' ' + model.get("number") + ')' + ' - ';
-			});
-			
-			link = link + '(page: ' + MyCourseInputListView.page + ')';
-			this.$el.html(link);
+			var data;
+			data = {
+				name: this.model.get("name")
+			};
+			this.$el.html(this.$template(data));
 			return this;
 		}
 	});
 	
 	SavedCollection = Backbone.Collection.extend({
-		model: SavedModel
+		model: SavedModel,
+		
+		sync: function(method, collection, options) {
+			if (method === 'read') {
+				var savedCombinations;
+				savedCombinations = amplify.store( "savedCombinations");
+				options.success(savedCombinations);
+			}
+		}
 	});
 	
 	SavedCollectionView = Backbone.View.extend({
@@ -565,6 +593,15 @@
 		
 		initialize: function() {
 			this.collection.on('add', this.addSaved, this);
+			this.collection.on('reset', this.addAll, this);
+		},
+		
+		addAll: function(collection) {
+			var self;
+			self = this;
+			_.each(collection.models, function(model) {
+				self.addSaved(model);
+			});
 		},
 		
 		addSaved: function(model) {
@@ -589,13 +626,21 @@
 		
 		save: function() {
 			if (this.collection.where({url: MyAppRouter.url}).length === 0 && MyAppRouter.url.length !== 0) {
-				this.collection.add(new SavedModel({url: MyAppRouter.url}));
+				var link = '';
+			
+				_.each(MyCourseCollection.models, function(model) {
+					link = link + model.get("crn") + ' (' + model.get("subject_code") + ' ' + model.get("number") + ')' + ' - ';
+				});
+				link = link + '(page: ' + MyCourseInputListView.page + ')';
+				
+				this.collection.create({url: MyAppRouter.url, name: link});
 			}
 		}
 	});
 	
 	MySavedCollection = new SavedCollection();
 	MySavedCollectionView = new SavedCollectionView({collection:MySavedCollection});
+	MySavedCollection.fetch();
 	/***** End of the third module ****/
 	
 	/**********************************************************************/
@@ -665,7 +710,7 @@
 			});
 			url = page + '_' + days.join('-') + '_' + joinedCourses.join('_') + '.json?_=' + cacheKey;
 
-			MyCourseCollection.url = '/siscode/courses/fetch/' + url;
+			MyCourseCollection.url = webroot + 'courses/fetch/' + url;
 			MyCourseScheduleView.loading(true);
 			MyCourseCollection.reset();
 			MyCourseCollection.fetch({
@@ -677,8 +722,8 @@
 	});
 	MyAppRouter = new AppRouter();
 	
-	Backbone.history.start({pushState: true, root: '/siscode/'});
+	Backbone.history.start({pushState: true, root: webroot});
 
 	/**** End of Router Module ****/
 	
-}(jQuery, Backbone, _, Handlebars));
+}(jQuery, Backbone, _, Handlebars, amplify));

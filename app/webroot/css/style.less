@@ -400,11 +400,12 @@ input {
 
 /*foot-bar CSS */
 .foot-bar {
+	z-index: 10;
 	position: fixed;
 	bottom: -260px;
 	height: 300px;
 	width: 900px;
-	background-color: #DDD;
+	background-color: #EEE;
 	left: 50%;
 	margin-left: -450px;
 	border-top-left-radius: 10px;
@@ -445,12 +446,32 @@ input {
   background-position: 0 -96px;
 }
 .foot-bar-combination {
-	padding: 10px;
+	padding: 15px;
 	list-style-position: inside;
-	font-size: 14px;
+	list-style: none;
+	font-size: 13px;
 }
 .foot-bar-combination li {
 	cursor: pointer;
+	padding: 10px 0 10px 10px;
+	border-top: solid thin #999;
+}
+.foot-bar-combination li:first-child {
+	border-top: none;
+	padding-top: 0;
+}
+.foot-bar-content {
+	overflow-y: scroll;
+	height: 260px;
+}
+.foot-bar-remove {
+	.icon;
+	margin: 3px 0 0 8px;
+  background-position: -24px -96px;
+	opacity: 0.6;
+}
+.foot-bar-remove:hover {
+	opacity: 1;
 }
 .icon {
   display: inline-block;

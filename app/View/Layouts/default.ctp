@@ -10,9 +10,10 @@
 		<?php echo $this->HtmlLogic->script('html5shiv');?>
 	<![endif]-->
 </head>
-<body data-cache_key="6">
+<body data-cache_key="6" data-webroot="<?php echo $this->webroot; ?>">
 	<?php echo $this->fetch('content'); ?>
 	<?php echo $this->HtmlLogic->script('jquery-1.7.2.min'); ?>
+	<?php echo $this->HtmlLogic->script('amplify.min'); ?>
 	
 	<?php echo $this->HtmlLogic->script(array(
 		'jquery.tooltip',

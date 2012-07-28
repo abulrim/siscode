@@ -73,6 +73,10 @@
 		</ul>
 	</div>
 </div>
+<?php echo $this->HtmlLogic->startTemplate(array('id' => 'foot-bar-combination-tmpl')); ?>
+	{{name}}<i class="foot-bar-remove"></i>
+<?php echo $this->HtmlLogic->endTemplate(); ?>
+	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>
 	<div class="course-floats">
 		<select name="subject_id" class="course-subject" data-placeholder="Select a Subject">
