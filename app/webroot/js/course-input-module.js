@@ -72,12 +72,6 @@
 	SubjectListView = Backbone.View.extend({
 			template: H.compile($('#course-input-subjects').html()),
 			
-			initialize: function() {
-				this.$el.on('change', function() {
-					console.log('Change!!!');
-				});
-			},
-			
 			render: function() {
 				var subjects = [];
 				_.each(this.collection.models, function(model) {
@@ -525,47 +519,105 @@
 		},
 		
 		sync: function(method, model, options) {
-			var combinations;
+			var combinations, createdModel, modelId, index;
 			if (method === 'create') {
 				combinations = amplify.store( "savedCombinations");
 				if (!combinations) {
 					combinations = [];
 				}
-				combinations.push(this.toJSON());
+				createdModel = this.toJSON();
+				createdModel.id = _.uniqueId();
+				combinations.push(createdModel);
 				amplify.store("savedCombinations", combinations);
+				options.success(createdModel);
 			} else if(method === 'delete') {
-				console.log('aaaa');
+				modelId = model.get("id");
+				combinations = amplify.store("savedCombinations", combinations);
+				index = null;
+				_.each(combinations, function(combination, key) {
+					if (combination.id === modelId) {
+						index = key;
+						return false;
+					}
+				});
+				if (index !== null) {
+					combinations.splice(index, 1);
+				}
+				amplify.store( "savedCombinations", combinations);
+			} else if (method === 'update') {
+				modelId = model.get("id");
+				combinations = amplify.store("savedCombinations", combinations);
+				index = null;
+				_.each(combinations, function(combination, key) {
+					if (combination.id === modelId) {
+						combinations[key] = model.toJSON();
+						return false;
+					}
+				});
+				amplify.store( "savedCombinations", combinations);
 			}
+		},
+		
+		clear: function() {
+			this.destroy();
 		}
 	});
 	
 	SavedView = Backbone.View.extend({
 		tagName: 'li',
 		
+		editMode: false,
+		
 		$template: H.compile($('#foot-bar-combination-tmpl').html()),
 		events: {
-			'click': 'goToSavedUrl',
-			'click .foot-bar-remove': 'removeCombination'
+			'click a': 'goToSavedUrl',
+			'click .foot-bar-remove': 'removeCombination',
+			'click .foot-bar-edit': 'editCombination',
+			'keypress input': 'updateCombination'
+		},
+		
+		editCombination: function() {
+			if (this.editMode) {
+				this.update();
+			} else {
+				this.editMode = true;
+				this.$('.foot-bar-combination-name').hide();
+				this.$('input').show().focus().select();
+			}
+			return false;
+		},
+		
+		updateCombination: function(e) {
+			if (e.keyCode === 13) {
+				this.update();
+			}
+		},
+		
+		update: function() {
+			var newName;
+			this.$('.foot-bar-combination-name').show();
+			newName = this.$('input').hide().val();
+			this.model.save({name: newName});
+			this.editMode = false;
 		},
 		
 		removeCombination: function() {
-			//console.log(this.collection);
+			this.model.clear();
 			return false;
 		},
 		
 		goToSavedUrl: function() {
 			MyAppRouter.navigate('c/' + this.model.get("url"), {trigger: true});
+			return false;
 		},
 		
 		initialize: function() {
-		},
+      this.model.on('destroy', this.remove, this);
+      this.model.on('change:name', this.render, this);
+    },
 		
 		render: function() {
-			var data;
-			data = {
-				name: this.model.get("name")
-			};
-			this.$el.html(this.$template(data));
+			this.$el.html(this.$template(this.model.toJSON()));
 			return this;
 		}
 	});
@@ -592,7 +644,7 @@
 		},
 		
 		initialize: function() {
-			this.collection.on('add', this.addSaved, this);
+			this.collection.on('add', this.addOne, this);
 			this.collection.on('reset', this.addAll, this);
 		},
 		
@@ -600,26 +652,38 @@
 			var self;
 			self = this;
 			_.each(collection.models, function(model) {
-				self.addSaved(model);
+				self.addSaved(model, true);
 			});
 		},
 		
-		addSaved: function(model) {
+		addOne: function(model) {
+			this.addSaved(model);
+		},
+		
+		addSaved: function(model, ignore) {
 			var view, $viewEl;
 			view = new SavedView({model:model});
 			view.render();
 			$viewEl = view.$el;
-			this.$('.foot-bar-combination').append($viewEl);
+			this.$('.foot-bar-combination').prepend($viewEl);	
+			if (!ignore) {
+				view.editCombination();
+				if (!this.toggled) {
+					this.toggleFoot();
+				}
+			}
 		},
 		
-		toggleFoot: function(event) {
+		toggleFoot: function() {
+			var arrow;
+			arrow = this.$('.foot-bar-arrow');
 			if (this.toggled === false) {
 				this.$el.css('bottom', '0px');
-				this.$(event.target).addClass('down');
+				arrow.addClass('down');
 				this.toggled = true;
 			} else {
 				this.$el.css('bottom', -(this.$el.height() - 40) + 'px');
-				this.$(event.target).removeClass('down');
+				arrow.removeClass('down');
 				this.toggled = false;
 			}
 		},

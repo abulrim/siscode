@@ -90,7 +90,7 @@ body {
 	line-height: @row-height;
 	text-align: center;
 }
-.course-number:focus, .course-crn:focus {
+.course-crn:focus, .foot-bar-edit-input:focus {
 	border-color: rgba(82, 168, 236, 0.8);
 	outline: 0;
 	outline: thin dotted 9;
@@ -98,7 +98,7 @@ body {
 	-moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(82,168,236,0.6);
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),0 0 8px rgba(82, 168, 236, 0.6);
 }
-.course-number, .course-crn {
+.course-crn, .foot-bar-edit-input {
 	width: 50px;
 	height: 16px;
 	padding: 4px;
@@ -444,6 +444,10 @@ input {
 	float: right;
 	.icon;
   background-position: 0 -96px;
+	opacity: 0.6;
+}
+.foot-bar-add:hover {
+	opacity: 1;
 }
 .foot-bar-combination {
 	padding: 15px;
@@ -452,7 +456,6 @@ input {
 	font-size: 13px;
 }
 .foot-bar-combination li {
-	cursor: pointer;
 	padding: 10px 0 10px 10px;
 	border-top: solid thin #999;
 }
@@ -466,12 +469,24 @@ input {
 }
 .foot-bar-remove {
 	.icon;
-	margin: 3px 0 0 8px;
+	margin: 3px 0 0 0;
   background-position: -24px -96px;
 	opacity: 0.6;
 }
 .foot-bar-remove:hover {
 	opacity: 1;
+}
+.foot-bar-edit {
+	.foot-bar-remove;
+	margin-left: 3px;
+  background-position: 0 -72px;
+}
+.foot-bar-edit:hover {
+	opacity: 1;
+}
+.foot-bar-combination-name {
+	color: #333;
+	text-decoration: none;
 }
 .icon {
   display: inline-block;
@@ -484,5 +499,9 @@ input {
   background-position: 14px 14px;
   background-repeat: no-repeat;
 	cursor: pointer;
+}
+.foot-bar-edit-input {
+	display: none;
+	width: 600px;
 }
 /* End of foot-bar CSS */

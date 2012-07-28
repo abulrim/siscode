@@ -74,7 +74,10 @@
 	</div>
 </div>
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'foot-bar-combination-tmpl')); ?>
-	{{name}}<i class="foot-bar-remove"></i>
+	<a class="foot-bar-combination-name" href="<?php echo $this->webroot . 'c/'; ?>{{url}}" name="foot-bar-combination-name">{{name}}</a>
+	<input type="text" value="{{name}}" class="foot-bar-edit-input" />
+	<i class="foot-bar-edit"></i>
+	<i class="foot-bar-remove"></i>
 <?php echo $this->HtmlLogic->endTemplate(); ?>
 	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>
