@@ -11,12 +11,32 @@ class HtmlLogicHelper extends AppHelper{
         
         
         protected $_later='';
-        
+	
+	
         function __construct(View $view, $settings = array()) {
             parent::__construct($view, $settings);
         }
         
-        
+        public function less($path, $lessScript = null) {
+		$absolutePath = APP . 'webroot' . DS . 'css' . DS;
+		
+		$string = '<link rel="stylesheet/less" type="text/css" href="' . $this->webroot . 'css/' . $path . '.less" />';
+		if (Configure::read('debug') == 0 && file_exists($absolutePath . $path . '.css')) {
+			if(file_exists($absolutePath . $path . '.min.css')) {
+				$file = $path . '.min';
+			} else {
+				$file = $path;
+			}
+			$string = $this->Html->css($file);
+		} elseif ($lessScript) {
+			$string .= $this->Html->script($lessScript);
+		}
+		
+		return $string;
+	}
+	
+	
+	
         public function css($paths,$rel=null,$options=array()){
 		$options = Hash::merge(array(
 			'inline' => true,

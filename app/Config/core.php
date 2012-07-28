@@ -278,12 +278,18 @@ Cache::config('_cake_model_', array(
 ));
 
 
+
 Configure::write('StaticLogic.js', array(
 	'course-input-module',
 	'handlebars-1.0.0.beta.6',
 	'jquery.tooltip'
 ));
 
+Configure::write('StaticLogic.less', array(
+	'style'
+));
+
 Configure::write('StaticLogic.css', array(
-	'chosen'
+	'chosen',
+	'style'
 ));
