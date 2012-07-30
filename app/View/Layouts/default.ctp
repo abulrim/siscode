@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="description" content="SIScode is a free web application designed to help AUB students build their schedule without worrying about facing time conflicts during registration" />
 	<meta charset="utf-8">
 	<title>siscode</title>
 	<?php echo $this->HtmlLogic->css('chosen'); ?>
