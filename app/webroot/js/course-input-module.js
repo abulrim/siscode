@@ -248,7 +248,9 @@
 			} else if(action === -1) {
 				this.page -= 1;
 			} else if (action === 1) {
-				this.page += 1;
+				if (this.page < MyCourseCollection.maxPage) {
+					this.page += 1;
+				}
 			}
 			this.page = Math.max(1, this.page);
 			var data = [], url = '', days = [], val;
@@ -428,13 +430,12 @@
 			}
 		},
 		
-		addAll: function(col) {
+		addAll: function(col, options) {
 			var $error,self;
 			this.$('.schedule-day').html('');
 			self = this;
 			$error	= this.$('.empty-error');
-			
-			if (col.maxPage === 0) {
+			if (options.success && col.models.length === 0) {
 				$error.html(this.errorMessages[Math.floor(Math.random()*this.errorMessages.length)]);
 				$error.show();
 			} else {
