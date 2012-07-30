@@ -1,0 +1,10 @@
+IndexIgnore *
+
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault "access 1 months"
+</IfModule>
+
+<ifModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE  application/javascript application/x-javascript text/javascript
+</ifModule>

@@ -91,12 +91,17 @@ class CoursesController extends AppController {
 					));
 					if (!empty($fetchedCourse)) {
 						$courses[] = $fetchedCourse;
+					} else {
+						$courses = array();
+						break;
 					}
 				}
-				$combinations = $this->_getCombinations($courses, $combinations);
 				$combinationsCourseIds = array();
-				foreach($combinations as $combination) {
-					$combinationsCourseIds[] = Hash::extract($combination, '{n}.Course.id');
+				if (!empty($courses)) {
+					$combinations = $this->_getCombinations($courses, $combinations);
+					foreach($combinations as $combination) {
+						$combinationsCourseIds[] = Hash::extract($combination, '{n}.Course.id');
+					}
 				}
 				//Cache only course ids combinations
 				Cache::write($cacheName, $combinationsCourseIds);
@@ -136,6 +141,9 @@ class CoursesController extends AppController {
 				}
 			}
 		}
+		if (empty($courses)) {
+			$count = $page = 0;
+		}
 		$content = array(
 			'status' => 'success',
 			'content' => $courses,
@@ -162,6 +170,9 @@ class CoursesController extends AppController {
 		
 		foreach($inputs as $input) {
 			$combinations = $this->_checkConflict($combinations, $input);
+			if (empty($combinations)) {
+				return $combinations;
+			}
 		}
 		return $combinations;
 	}
@@ -170,12 +181,14 @@ class CoursesController extends AppController {
 	protected function _checkConflict($combinations, $input) {
 		$newCombination = array();
 		
+		//First run fill the combinations array with the first input
 		if (empty($combinations)) {
 			foreach ($input as $key => $el) {
 				$input[$key] = array($el);
 			}
 			return $input;
 		}
+		//If not first run loop through the rest of the inputs
 		foreach($input as $course) {
 			foreach($combinations as $combination) {
 				if (!$this->_isTimeConflict($combination, $course)) {

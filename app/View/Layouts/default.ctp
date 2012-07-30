@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>SIScode</title>
+	<title>siscode</title>
 	<?php echo $this->HtmlLogic->css('chosen'); ?>
 	<?php echo $this->HtmlLogic->less('style', 'less-1.3.0.min');?>
 	<!--[if lt IE 9]>

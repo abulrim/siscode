@@ -3,3 +3,7 @@
     RewriteRule    ^$    webroot/    [L]
     RewriteRule    (.*) webroot/$1    [L]
 </IfModule>
+
+<ifModule mod_deflate.c>
+ AddOutputFilterByType DEFLATE text/html text/plain text/xml application/json
+</ifModule>

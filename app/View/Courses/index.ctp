@@ -25,6 +25,7 @@
 
 	<section class="schedule">
 		<div class="loader"></div>
+		<div class="empty-error">No results! Take a break this semester, work at McDonalds instead</div>
 		<div class="schedule-header">
 			<ul class="weekdays">
 				<li></li>
@@ -65,7 +66,9 @@
 </div>
 <div class="foot-bar">
 	<div class="foot-bar-top">
-		<i class="foot-bar-arrow"></i>
+		<div class="foot-bar-toggle">
+			<i class="foot-bar-arrow"></i>
+		</div>
 		<i class="foot-bar-add"></i>
 	</div>
 	<div class="foot-bar-content">

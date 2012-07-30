@@ -54,11 +54,36 @@
 		MySavedCollection,
 		MySavedCollectionView,
 		
+		AppView,
+		MyAppView,
+		
 		cacheKey,
 		webroot;
 		
 		webroot = $('body').data('webroot');
 		cacheKey = $('body').data('cache_key');
+	
+	AppView = Backbone.View.extend({
+		el: 'body',
+		
+		events:{
+			'keyup': 'keyup'
+		},
+		
+		keyup: function(e) {
+			if ($(e.target).is('input')) {
+				return;
+			}
+			if(e.keyCode === 37) {
+				this.trigger('leftArrowUp');
+			} else if(e.keyCode === 39) {
+				this.trigger('rightArrowUp');
+			}
+		}
+		
+	});
+	
+	MyAppView = new AppView();
 	
 	/**** First module responsible for getting data from the inputs ****/
 	SubjectModel = Backbone.Model.extend({
@@ -188,6 +213,18 @@
 		
 		initialize: function() {
 			this.collection.on('add', this.addInput, this);
+			MyAppView.on('leftArrowUp', this.updatePrevious, this);
+			MyAppView.on('rightArrowUp', this.updateNext, this);
+		},
+		
+		updatePrevious: function() {
+			console.log('left');
+			this.updateUrl(-1);
+		},
+		
+		updateNext: function() {
+			console.log('right');
+			this.updateUrl(1);
 		},
 		
 		addInput: function(model) {
@@ -366,6 +403,17 @@
 	CourseScheduleView = Backbone.View.extend({
 		el: '.schedule',
 		
+		errorMessages: [
+			"No results! Take a break this semester, work at McDonalds instead",
+			"No results! Seriously, flipping burgers is fun",
+			"No results! I like fries with my burger", 
+			"No results! One tawouk, toum extra please", 
+			"Hooray! No need to come to uni this semester. Just kidding, No results",
+			"No results! Have you considered dropping out?",
+			"No results! Try LUCK 101",
+			"No results! Never give up, Bill Gates was a dropout and look where he is today"
+		],
+		
 		initialize: function() {
 			var self = this;
 			this.collection.on('reset', this.addAll, this);
@@ -383,8 +431,17 @@
 		},
 		
 		addAll: function(col) {
+			var $error,self;
 			this.$('.schedule-day').html('');
-			var self = this;
+			self = this;
+			$error	= this.$('.empty-error');
+			
+			if (col.maxPage === 0) {
+				$error.html(this.errorMessages[Math.floor(Math.random()*this.errorMessages.length)]);
+				$error.show();
+			} else {
+				$error.hide();
+			}
 			_.each(col.models, function(model) {
 				self.addOne(model);
 			});
@@ -639,7 +696,7 @@
 		toggled: false,
 		
 		events: {
-			'click .foot-bar-arrow': 'toggleFoot',
+			'click .foot-bar-toggle': 'toggleFoot',
 			'click .foot-bar-add': 'save'
 		},
 		
