@@ -1,6 +1,11 @@
 <?php
 class CoursesController extends AppController {
+	public $helpers = array('Cache');
+	
 	public function index() {
+		if (Configure::read('debug') == 0) {
+			$this->cacheAction = '+1 day';
+		}
 		$this->Course->Subject->contain(array(
 			'Course' => array(
 				'fields' => array('DISTINCT Course.number')
