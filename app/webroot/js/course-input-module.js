@@ -197,7 +197,7 @@
 	CourseInputListView = Backbone.View.extend({
 		el: '.cil',
 		
-		page: 1,
+		page: 0,
 		
 		events: {
 			"click #add-course"	: 'addInputModel',
@@ -218,12 +218,10 @@
 		},
 		
 		updatePrevious: function() {
-			console.log('left');
 			this.updateUrl(-1);
 		},
 		
 		updateNext: function() {
-			console.log('right');
 			this.updateUrl(1);
 		},
 		

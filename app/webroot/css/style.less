@@ -11,7 +11,7 @@ body {
 	margin-top:0;
 	display: block;
 	margin: 0;
-	padding: 0;
+	padding: 0 0 60px 0;
 	font-family: Arial, Helvetica, sans-serif;
 	color: #333;
 	background-image: url('../img/tiny_grid.png');
@@ -202,13 +202,13 @@ body {
 	display: inline-block;
 	width: 14px;
 	height: 14px;
-	background-image: url("../img/glyphicons-halflings.png");
-  background-position: -312px 0;
+	background-image: url("../img/sprite.png");
+  background-position: 0 0;
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
 .remove-course-btn:hover {
-  background-position: -456px 0;
+  background-position: -14px 0;
 }
 input {
 	color: #555;
@@ -253,8 +253,8 @@ input {
 	display: inline-block;
 	width: 14px;
 	height: 14px;
-	background-image: url("../img/glyphicons-halflings.png");
-  background-position: -408px -144px;
+	background-image: url("../img/sprite.png");
+  background-position: -28px 0;
 	background-repeat: no-repeat;
 	margin-right: 5px;
 }
@@ -305,15 +305,15 @@ input {
 	display: block;
 	width: 14px;
 	height: 14px;
-	background-image: url("../img/glyphicons-halflings.png");
+	background-image: url("../img/sprite.png");
 	background-repeat: no-repeat;
 	margin: 7px auto 0 auto;
 }
 .arrow-right {
-	background-position: -456px -72px;
+	background-position: -84px 0;
 }
 .arrow-left {
-  background-position: -432px -72px;
+  background-position: -70px 0;
 }
 .paginator-text {
 	float: right;
@@ -338,9 +338,9 @@ input {
 	display: block;
 	width: 14px;
 	height: 14px;
-	background-image: url("../img/glyphicons-halflings-white.png");
+	background-image: url("../img/sprite.png");
 	background-repeat: no-repeat;
-  background-position: -408px -96px;
+  background-position: -140px 0;
 	margin-top: 2px;
 	margin-right: 4px;
 	float: left;
@@ -407,11 +407,18 @@ input {
 	margin-left: -450px;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
-	-webkit-transition: bottom 500ms;
+	.transition(linear, bottom, 0.3s);
 	border: solid thin #BBB;
 	-webkit-box-shadow: 0px 0px 10px rgba(50, 50, 50, 0.75);
 	-moz-box-shadow:    0px 0px 10px rgba(50, 50, 50, 0.75);
 	box-shadow:         0px 0px 10px rgba(50, 50, 50, 0.75);
+}
+.transition(@type: linear, @prop: all, @time: 1s) {
+	-webkit-transition: @type @prop @time;
+	-moz-transition: @type @prop @time;
+	-o-transition: @type @prop @time;
+	-ms-transition: @type @prop @time;
+	transition: @type @prop @time;
 }
 .foot-bar-top {
 	position: relative;
@@ -440,15 +447,15 @@ input {
 .foot-bar-arrow {
 	float: left;
 	.icon;
-  background-position: -288px -120px;
+  background-position: -56px 0;
 }
 .foot-bar-arrow.down {
-  background-position: -313px -119px;
+  background-position: -42px 0;
 }
 .foot-bar-add {
 	float: right;
 	.icon;
-  background-position: 0 -96px;
+  background-position: -98px 0;
 	opacity: 0.6;
 }
 .foot-bar-add:hover {
@@ -475,7 +482,7 @@ input {
 .foot-bar-remove {
 	.icon;
 	margin: 3px 0 0 0;
-  background-position: -24px -96px;
+  background-position: -112px 0;
 	opacity: 0.6;
 }
 .foot-bar-remove:hover {
@@ -484,7 +491,7 @@ input {
 .foot-bar-edit {
 	.foot-bar-remove;
 	margin-left: 3px;
-  background-position: 0 -72px;
+  background-position: -126px 0;
 }
 .foot-bar-edit:hover {
 	opacity: 1;
@@ -500,7 +507,7 @@ input {
 	margin: 13px;
   line-height: 14px;
   vertical-align: text-top;
-  background-image: url("../img/glyphicons-halflings.png");
+  background-image: url("../img/sprite.png");
   background-position: 14px 14px;
   background-repeat: no-repeat;
 	cursor: pointer;
