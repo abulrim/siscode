@@ -3,6 +3,7 @@
 <head>
 	<meta name="description" content="SIScode is a free web application designed to help AUB students build their schedule without worrying about facing time conflicts during registration" />
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1" />
 	<title>siscode</title>
 	<?php echo $this->HtmlLogic->css('chosen'); ?>
 	<?php echo $this->HtmlLogic->less('style', 'less-1.3.0.min');?>

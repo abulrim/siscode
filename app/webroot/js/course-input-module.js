@@ -130,8 +130,8 @@
 		
 		events: {
 			'change select[name=subject_id]':'fillNumber',
-			'click .remove-course' : 'removeCourse',
-			'keyup .course-crn' : 'crnKeyUp'
+			'click .cil-remove-course' : 'removeCourse',
+			'keyup .cil-course-crn' : 'crnKeyUp'
 		},
 		
 		crnKeyUp: function(event) {
@@ -198,9 +198,10 @@
 		el: '.cil',
 		
 		page: 0,
+		closed: false,
 		
 		events: {
-			"click #add-course"	: 'addInputModel',
+			"click .cil-add-course"	: 'addInputModel',
 			"click .cil-submit"	: 'updateUrlEvent',
 			'keypress .course-input' : 'keyLog'
 		},
@@ -243,6 +244,11 @@
 		},
 		
 		updateUrl: function(action) {
+			console.log(this.closed);
+			if (!this.closed) {
+				this.$el.addClass('cil-hidden');
+				this.closed = true;
+			}
 			if (action === undef) {
 				this.page = 1;
 			} else if(action === -1) {
@@ -424,9 +430,9 @@
 		
 		loading: function(show) {
 			if (show) {
-				this.$('.loader').show();
+				this.$('.schedule-loader').show();
 			} else {
-				this.$('.loader').hide();
+				this.$('.schedule-loader').hide();
 			}
 		},
 		
@@ -486,7 +492,7 @@
 	//The CourseSlot view
 	CourseSlotView = Backbone.View.extend({
 		tagName: 'div',
-		className: 'course-slot',
+		className: 'schedule-course-slot',
 		
 		render: function() {
 			var $template,
@@ -499,7 +505,7 @@
 			data.start_time = data.start_time.substr(0, 5);
 			data.end_time = data.end_time.substr(0, 5);
 			this.$el.html(compiled(data));
-			this.$('.course-slot-wrapper').css({
+			this.$('.schedule-course-slot-wrapper').css({
 				backgroundColor: this.model.courseModel.get('color').background,
 				borderColor: this.model.courseModel.get('color').border
 			});
@@ -518,8 +524,8 @@
 		tagName: 'div',
 		
 		events: {
-			'click .next': 'updateUrlNext',
-			'click .previous': 'updateUrlPrevious'
+			'click .paginator-next': 'updateUrlNext',
+			'click .paginator-previous': 'updateUrlPrevious'
 		},
 		
 		updateUrlNext: function() {
@@ -546,10 +552,10 @@
 			};
 			this.$el.html(compiled(data));
 			if (+this.collection.page >= +this.collection.maxPage) {
-				this.$('.next').addClass('disabled');
+				this.$('.paginator-next').addClass('paginator-disabled');
 			}
 			if (+this.collection.page === 1) {
-				this.$('.previous').addClass('disabled');
+				this.$('.paginator-previous').addClass('paginator-disabled');
 			}
 			if (this.collection.maxPage === 0) {
 				this.$el.hide();
