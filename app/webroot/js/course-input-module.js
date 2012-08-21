@@ -58,10 +58,17 @@
 		MyAppView,
 		
 		cacheKey,
-		webroot;
+		webroot,
+		
+		IS_MOBILE;
 		
 		webroot = $('body').data('webroot');
 		cacheKey = $('body').data('cache_key');
+	
+	
+	
+	var IS_MOBILE = navigator.userAgent.match(/mobile/i);
+	
 	
 	AppView = Backbone.View.extend({
 		el: 'body',
@@ -124,7 +131,7 @@
 	//Course view
 	CourseInputView = Backbone.View.extend({
 		tagName: 'div',
-		className: 'cli-course-input',
+		className: 'cil-course-input',
 		template: H.compile($('#course-input-tmpl').html()),
 		numberTemplate: H.compile($('#course-input-numbers').html()),
 		
@@ -201,8 +208,6 @@
 		closed: false,
 		
 		events: {
-			"click .cil-add-course"	: 'addInputModel',
-			"click .cil-submit"	: 'updateUrlEvent',
 			'keypress .course-input' : 'keyLog'
 		},
 		
@@ -214,6 +219,7 @@
 		
 		initialize: function() {
 			this.collection.on('add', this.addInput, this);
+			this.collection.on('reset', this.closeInputs, this);
 			MyAppView.on('leftArrowUp', this.updatePrevious, this);
 			MyAppView.on('rightArrowUp', this.updateNext, this);
 		},
@@ -226,6 +232,14 @@
 			this.updateUrl(1);
 		},
 		
+		closeInputs: function() {
+			this.$el.addClass('cil-hidden');
+		},
+		
+		openInputs: function() {
+			this.$el.removeClass('cil-hidden');
+		},
+		
 		addInput: function(model) {
 			var view, $viewEl;
 			view = new CourseInputView({model:model});
@@ -235,20 +249,42 @@
 			view.afterRender();
 		},
 		
+		// workaround for mobile browsers
+		// in which the view elem will become active if click event
+		// is used by default backbone events
+		afterRender: function() {
+			var self = this, event;
+			this.$('.cil-add-course').on('click', function() {
+				self.addInputModel();
+			});
+			
+			this.$('.cil-submit').on('click', function() {
+				self.updateUrlEvent();
+			});
+			
+			event = 'click';
+			if (IS_MOBILE) {
+				event = 'touchstart';
+			}
+			this.$('.cil-expand-arrow').on(event, function() {
+				self.openInputs();
+				});
+			
+
+			return this;
+		},
+		
 		addInputModel: function() {
 			this.collection.add(new CourseInputModel());
 		},
 		
 		updateUrlEvent: function(){
 			this.updateUrl();
+			this.closeInputs();
 		},
 		
 		updateUrl: function(action) {
-			console.log(this.closed);
-			if (!this.closed) {
-				this.$el.addClass('cil-hidden');
-				this.closed = true;
-			}
+			
 			if (action === undef) {
 				this.page = 1;
 			} else if(action === -1) {
@@ -260,7 +296,7 @@
 			}
 			this.page = Math.max(1, this.page);
 			var data = [], url = '', days = [], val;
-			this.$('.cli-course-input').each(function() {
+			this.$('.cil-course-input').each(function() {
 				data.push([
 					$(this).find('select[name=subject_id]').val(),$(this).find('select[name=number]').val(),$(this).find('input[name=crn]').val()
 				]);
@@ -298,7 +334,7 @@
 	MySubjectCollection = new SubjectCollection();
 	MySubjectCollection.reset(subjects);
 	MyCourseInputCollection = new CourseInputCollection();
-	MyCourseInputListView = new CourseInputListView({collection:MyCourseInputCollection});
+	MyCourseInputListView = (new CourseInputListView({collection:MyCourseInputCollection})).afterRender();
 	
 	/**** End of First Module ****/
 	
@@ -440,7 +476,7 @@
 			var $error,self;
 			this.$('.schedule-day').html('');
 			self = this;
-			$error	= this.$('.empty-error');
+			$error	= this.$('.schedule-empty-error');
 			if (options.success && col.models.length === 0) {
 				$error.html(this.errorMessages[Math.floor(Math.random()*this.errorMessages.length)]);
 				$error.show();
@@ -631,6 +667,7 @@
 		editMode: false,
 		
 		$template: H.compile($('#foot-bar-combination-tmpl').html()),
+		
 		events: {
 			'click a': 'goToSavedUrl',
 			'click .foot-bar-remove': 'removeCombination',
@@ -696,13 +733,21 @@
 		}
 	});
 	
+	
+	
 	SavedCollectionView = Backbone.View.extend({
 		el: '.foot-bar',
 		toggled: false,
 		
-		events: {
-			'click .foot-bar-toggle': 'toggleFoot',
-			'click .foot-bar-add': 'save'
+		events: function() {
+			var events = IS_MOBILE ? {
+					'touchstart .foot-bar-toggle': 'toggleFoot',
+					'touchstart .foot-bar-add': 'save'
+				}:{
+					'click .foot-bar-toggle': 'toggleFoot',
+					'click .foot-bar-add': 'save'
+			};
+			return events;
 		},
 		
 		initialize: function() {
@@ -817,6 +862,7 @@
 				model.clear();
 			});
 			
+			MyCourseInputCollection.reset();
 			_.each(data, function(modelData) {
 				MyCourseInputCollection.add(new CourseInputModel(modelData));
 			});
