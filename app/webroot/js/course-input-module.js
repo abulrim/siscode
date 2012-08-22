@@ -60,15 +60,18 @@
 		cacheKey,
 		webroot,
 		
-		IS_MOBILE;
+		IS_MOBILE,
+		clickOrTouch;
 		
 		webroot = $('body').data('webroot');
 		cacheKey = $('body').data('cache_key');
 	
 	
-	
-	var IS_MOBILE = navigator.userAgent.match(/mobile/i);
-	
+	clickOrTouch = 'click';
+	IS_MOBILE = navigator.userAgent.match(/mobile/i);
+	if (IS_MOBILE && 'ontouchstart' in document.documentElement) {
+		clickOrTouch = 'touchstart';
+	}
 	
 	AppView = Backbone.View.extend({
 		el: 'body',
@@ -234,10 +237,12 @@
 		
 		closeInputs: function() {
 			this.$el.addClass('cil-hidden');
+			$('body').addClass('cil-hidden');
 		},
 		
 		openInputs: function() {
 			this.$el.removeClass('cil-hidden');
+			$('body').removeClass('cil-hidden');
 		},
 		
 		addInput: function(model) {
@@ -268,7 +273,8 @@
 			}
 			this.$('.cil-expand-arrow').on(event, function() {
 				self.openInputs();
-				});
+				return false;
+			});
 			
 
 			return this;
@@ -668,11 +674,14 @@
 		
 		$template: H.compile($('#foot-bar-combination-tmpl').html()),
 		
-		events: {
-			'click a': 'goToSavedUrl',
-			'click .foot-bar-remove': 'removeCombination',
-			'click .foot-bar-edit': 'editCombination',
-			'keypress input': 'updateCombination'
+		
+		events: function() {
+				var event = {};
+				event[clickOrTouch + ' a'] = 'goToSavedUrl';
+				event[clickOrTouch + ' .foot-bar-remove'] = 'removeCombination';
+				event[clickOrTouch + ' .foot-bar-edit'] = 'editCombination';
+				event['keypress input'] = 'updateCombination';
+				return event;
 		},
 		
 		editCombination: function() {
@@ -738,7 +747,7 @@
 	SavedCollectionView = Backbone.View.extend({
 		el: '.foot-bar',
 		toggled: false,
-		
+
 		events: function() {
 			var events = IS_MOBILE ? {
 					'touchstart .foot-bar-toggle': 'toggleFoot',
@@ -785,14 +794,15 @@
 			var arrow;
 			arrow = this.$('.foot-bar-arrow');
 			if (this.toggled === false) {
-				this.$el.css('bottom', '0px');
+				this.$el.addClass('toggled');
 				arrow.addClass('down');
 				this.toggled = true;
 			} else {
-				this.$el.css('bottom', -(this.$el.height() - 40) + 'px');
+				this.$el.removeClass('toggled');
 				arrow.removeClass('down');
 				this.toggled = false;
 			}
+			return false;
 		},
 		
 		save: function() {

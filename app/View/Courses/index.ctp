@@ -1,4 +1,4 @@
-<div id="logo"></div>
+<a href="<?php echo $this->webroot; ?>"><div id="logo"></div></a>
 <div class="clear"></div>
 
 <div class="wrapper">
@@ -119,10 +119,14 @@
 </div>
 <div class="foot-bar">
 	<div class="foot-bar-top">
-		<div class="foot-bar-toggle">
-			<i class="foot-bar-arrow"></i>
+		<div class="foot-bar-toggle-wrapper">
+			<div class="foot-bar-toggle">
+				<i class="foot-bar-arrow"></i>
+			</div>
 		</div>
-		<i class="foot-bar-add"></i>
+		<div class="foot-bar-add">
+			<i class="foot-bar-add-icon"></i>
+		</div>
 	</div>
 	<div class="foot-bar-content">
 		<ul class="foot-bar-combination">
@@ -130,10 +134,17 @@
 	</div>
 </div>
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'foot-bar-combination-tmpl')); ?>
-	<a class="foot-bar-combination-name" href="<?php echo $this->webroot . 'c/'; ?>{{url}}" name="foot-bar-combination-name">{{name}}</a>
-	<input type="text" value="{{name}}" class="foot-bar-edit-input" />
-	<i class="foot-bar-edit"></i>
-	<i class="foot-bar-remove"></i>
+	<div class="foot-bar-combination-name-wrapper">
+		<div>
+			<a class="foot-bar-combination-name" href="<?php echo $this->webroot . 'c/'; ?>{{url}}" name="foot-bar-combination-name">{{name}}</a>
+		</div>
+		<div>
+			<input type="text" value="{{name}}" class="foot-bar-edit-input" />
+		</div>
+	</div>
+	<div class="foot-bar-edit"><i class="foot-bar-edit-icon"></i></div>
+	<div class="foot-bar-remove"><i class="foot-bar-remove-icon"></i></div>
+	<div class="clear"></div>
 <?php echo $this->HtmlLogic->endTemplate(); ?>
 	
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>

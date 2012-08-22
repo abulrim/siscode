@@ -13,7 +13,7 @@
 </head>
 <body data-cache_key="6" data-webroot="<?php echo $this->webroot; ?>">
 	<?php echo $this->fetch('content'); ?>
-	<?php echo $this->HtmlLogic->script('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');?>
+	<?php //echo $this->HtmlLogic->script('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');?>
 	<script>window.jQuery || document.write('<script type="text/javascript" src="<?php echo $this->webroot;?>js/jquery-1.7.2.min.js">\x3C/script>');</script>
 	
 	<?php echo $this->HtmlLogic->script('amplify.min'); ?>
