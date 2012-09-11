@@ -248,6 +248,7 @@ class CoursesController extends AppController {
 			unlink($entry);
 		}
 		Cache::clear();
+		clearCache();
 		exit('Done!');
 	}
 }
