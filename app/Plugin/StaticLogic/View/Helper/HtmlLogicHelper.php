@@ -80,7 +80,7 @@ class HtmlLogicHelper extends AppHelper{
 				$lastModified = filemtime($combinedFileName);
 				foreach($fileNames as $fileName) {
 					$completeFileName = $path . $fileName . '.css';
-					$currentModified = filemtime($currentModified);
+					$currentModified = filemtime($completeFileName);
 					if ($currentModified > $lastModified) {
 						$keep = false;
 						break;

@@ -99,7 +99,8 @@
 Cache::config('default', array(
 		'engine' => 'File',
 		'path' => CACHE . 'courses' . DS,
-		'duration' => '+1 month'
+		'duration' => '+1 month',
+		'mask' => 0777
 	)
 );
 
