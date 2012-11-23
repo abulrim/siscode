@@ -258,6 +258,10 @@ input {
 	display: none;
 }
 
+.ie8 .cil-filters input[type=checkbox] {
+	display: block;
+}
+
 .cil-filters label {
 	width: 32px;
 	height:32px;
@@ -273,6 +277,10 @@ input {
 .cil-filters input[type=checkbox]:checked+label {
 	.btn-background-gradient(#DA4F49, #EE5F5B, #BD362F);
 	color: white;
+}
+
+.ie8 .cil-filters label {
+	display: none;
 }
 
 .cil-filters-table tr td {

@@ -264,6 +264,9 @@ input {
 .cil-filters input[type=checkbox] {
   display: none;
 }
+.ie8 .cil-filters input[type=checkbox] {
+  display: block;
+}
 .cil-filters label {
   width: 32px;
   height: 32px;
@@ -286,6 +289,9 @@ input {
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='@from', endColorstr='@to', GradientType=0);
   filter: progid:dximagetransform.microsoft.gradient(enabled=false);
   color: white;
+}
+.ie8 .cil-filters label {
+  display: none;
 }
 .cil-filters-table tr td {
   text-align: center;

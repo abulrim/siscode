@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<!--[if lt IE 9]><html lang="en-us" class="ie8"><![endif]-->
+<!--[if gt IE 8]><!--><html lang="en-us"><!--<![endif]-->
 <head>
 	<meta name="description" content="SIScode is a free web application designed to help AUB students build their schedule without worrying about facing time conflicts during registration" />
 	<meta charset="utf-8">
@@ -9,6 +10,7 @@
 	<?php echo $this->HtmlLogic->less('style', 'less-1.3.0.min');?>
 	<!--[if lt IE 9]>
 		<?php echo $this->HtmlLogic->script('html5shiv');?>
+		<script src="https://raw.github.com/scottjehl/Respond/master/respond.min.js"></script>
 	<![endif]-->
 	<?php if (Configure::read('debug') == 0): ?>
 	<!-- Start of Woopra Code -->
