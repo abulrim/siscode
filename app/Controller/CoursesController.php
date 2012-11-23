@@ -242,13 +242,41 @@ class CoursesController extends AppController {
 		return $daysConditions;
 	}
 	
-	public function clear_cache() {
-		$mydir = APP . 'webroot' . DS . 'courses' . DS . 'fetch' . DS;
-		foreach(glob($mydir.'*.*') as $entry) {
-			unlink($entry);
+	public function clear_cache($key) {
+		
+		if ($key != Configure::read('CacheKey')) {
+			exit('Not done!');
 		}
+		
+		//delete cached json courses
+		$mydir = APP . 'webroot' . DS . 'courses' . DS . 'fetch' . DS;
+		$this->_deleteFiles($mydir);
+		
+		//delete cached cake models
+		$mydir = APP . 'tmp' . DS . 'cache' . DS . 'models' . DS;
+		$this->_deleteFiles($mydir);
+		
+		//delete cached files in persistent
+		$mydir = APP . 'tmp' . DS . 'cache' . DS . 'persistent' . DS;
+		$this->_deleteFiles($mydir);
+		
+		//delete cached views
+		$mydir = APP . 'tmp' . DS . 'cache' . DS . 'views' . DS;
+		$this->_deleteFiles($mydir);
+		
+		
 		Cache::clear();
 		clearCache();
 		exit('Done!');
+	}
+	
+	protected function _deleteFiles($dir) {
+		foreach(glob($dir.'*') as $entry) {
+			$fileName = explode('/', $entry);
+			$fileName = $fileName[count($fileName)-1];
+			if ($fileName !== 'empty') {
+				unlink($entry);
+			}
+		}
 	}
 }

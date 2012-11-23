@@ -32,6 +32,12 @@ class AppSchema extends CakeSchema {
 		'number' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 20, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'section' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'title' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 100, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'm' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		't' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		'w' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		'r' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		'f' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		's' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1)
 		),
@@ -39,8 +45,7 @@ class AppSchema extends CakeSchema {
 	);
 	public $instructors = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-		'firstname' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
-		'surname' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
+		'name' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1)
 		),

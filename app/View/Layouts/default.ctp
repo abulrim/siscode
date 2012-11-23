@@ -10,6 +10,7 @@
 	<!--[if lt IE 9]>
 		<?php echo $this->HtmlLogic->script('html5shiv');?>
 	<![endif]-->
+	<?php if (Configure::read('debug') == 0): ?>
 	<!-- Start of Woopra Code -->
 	<script type="text/javascript">
 		function woopraReady(tracker) {
@@ -28,6 +29,7 @@
 		})();
 	</script>
 	<!-- End of Woopra Code -->
+	<?php endif; ?>
 </head>
 <body data-cache_key="6" data-webroot="<?php echo $this->webroot; ?>">
 	<?php echo $this->fetch('content'); ?>

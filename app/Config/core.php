@@ -295,3 +295,5 @@ Configure::write('StaticLogic.css', array(
 	'chosen',
 	'style'
 ));
+
+Configure::write('CacheKey', '1234');

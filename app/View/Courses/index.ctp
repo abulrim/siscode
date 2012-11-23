@@ -185,7 +185,7 @@
 			<div class="tooltip-title">{{Course.title}}</div>
 			<div class="tooltip-body">
 				CRN: {{Course.crn}}
-				<br>Instructor: {{Instructor.firstname}} {{Instructor.surname}}
+				<br>Instructor: {{Instructor.name}}
 				<div class="resp-small">{{start_time}} - {{end_time}}</div>
 			</div>
 		</div>
