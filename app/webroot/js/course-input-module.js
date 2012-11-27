@@ -713,9 +713,24 @@
 			newName = this.$('input').hide().val();
 			this.model.save({name: newName});
 			this.editMode = false;
+			
+			if(window.woopraTracker) {
+				window.woopraTracker.pushEvent({
+					name: 'edit',
+					url: window.location.origin + webroot + 'c/' + this.model.get('url'),
+					title: newName
+				});
+			}
 		},
 		
 		removeCombination: function() {
+			if(window.woopraTracker) {
+				window.woopraTracker.pushEvent({
+					name: 'delete',
+					url: window.location.origin + webroot + 'c/' + this.model.get('url'),
+					title: this.model.get('name')
+				});
+			}
 			this.model.clear();
 			return false;
 		},
@@ -820,6 +835,14 @@
 				});
 				link = link + '(page: ' + MyCourseInputListView.page + ')';
 				
+				if(window.woopraTracker) {
+					window.woopraTracker.pushEvent({
+						name: 'save',
+						url: window.location.href,
+						title: link
+					});
+				}
+
 				this.collection.create({url: MyAppRouter.url, name: link});
 			}
 		}
