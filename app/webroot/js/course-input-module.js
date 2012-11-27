@@ -849,7 +849,7 @@
 		fillCourseInput: function(d) {
 			if(window.woopraTracker) {
 				window.woopraTracker.trackPageview({
-					url: window.location.pathname + window.location.search,
+					url: '/c/' + d,
 					title: document.title
 				});
 			}
