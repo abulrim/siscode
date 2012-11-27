@@ -841,6 +841,13 @@
 		},
 
 		fillCourseInput: function(d) {
+			if(window.woopraTracker) {
+				window.woopraTracker.trackPageview({
+					url: window.location.pathname + window.location.search,
+					title: document.title
+				});
+			}
+			
 			var data = [],
 				models,
 				array,

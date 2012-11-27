@@ -19,6 +19,7 @@
 			tracker.setDomain('siscode.me');
 			tracker.setIdleTimeout(300000);
 			tracker.track();
+			window.woopraTracker = tracker;
 			return false;
 		}
 		(function() {
