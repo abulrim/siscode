@@ -1,4 +1,4 @@
-<a href="<?php echo $this->webroot; ?>"><div id="logo"></div></a>
+<div id="logo"><a href="<?php echo $this->webroot; ?>"></a></div>
 <div class="clear"></div>
 
 <div class="wrapper">
@@ -116,6 +116,14 @@
 		</section>
 	</div>
 	
+	<div class="social-media">
+		<div class="social fb">
+			<div class="fb-like" data-href="http://www.facebook.com/siscode.me" data-send="false" data-layout="button_count" data-width="300" data-show-faces="false" data-font="arial"></div>
+		</div>
+		<div class="social twitter">
+			<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://siscode.me" data-text="Build your @AUB_Lebanon course schedule on" data-via="siscodeme">Tweet</a>
+		</div>
+	</div>
 </div>
 <div class="foot-bar">
 	<div class="foot-bar-top">

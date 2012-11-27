@@ -1,8 +1,14 @@
 /*jslint browser:true,devel:true,white:true,nomen:true,bad_new:true*/
-/*globals jQuery,Backbone,Handlebars,_, undefined*/ 
+/*globals jQuery,Backbone,Handlebars,_, undefined, FB*/ 
 
 (function ($, Backbone, _, H, amplify, undef) {
 	"use strict";
+	
+	window.fbAsyncInit = function() {
+		FB.Event.subscribe('edge.create', function() {
+			$('body').css('padding-bottom', '250px');
+		});
+	};
 	
 	//Handlebars 'equal' helper, enables us to select an option
 	H.registerHelper('equal', function(lvalue, rvalue, options) {

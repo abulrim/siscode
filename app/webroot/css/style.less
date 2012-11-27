@@ -97,6 +97,10 @@ input {
 	background: url(../img/logo_engraved.png);
 	margin: 20px auto;
 }
+#logo a {
+	display: block;
+	height: 100%;
+}
 .wrapper {
 	position: relative;
 	z-index: 15;
@@ -408,7 +412,7 @@ input {
 .paginator {
 	position: absolute;
 	bottom: -40px;
-	width: 100%;
+	right: 0;
 	z-index: 2;
 }
 .paginator-top {
@@ -632,9 +636,26 @@ input {
 	border-radius: 3px;
 	.input-border-blue-box-shadow;
 }
+.social-media {
+	display: none;
+}
 /*************************/
 
 @media only all and (min-width: @mobile) {
+	.social-media {
+		display: block;
+		position: absolute;
+		bottom: -40px;
+		left: 335px;
+	}
+
+	.social {
+		float: left;
+	}
+
+	.social.fb {
+		margin-right: 8px; 
+	}
 	.l-results {
 		display: block;
 	}

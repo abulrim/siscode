@@ -36,7 +36,15 @@
 </head>
 <body data-cache_key="6" data-webroot="<?php echo $this->webroot; ?>">
 	<?php echo $this->fetch('content'); ?>
-	<?php //echo $this->HtmlLogic->script('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');?>
+	
+	<!-- fb code -->
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) return;js = d.createElement(s); js.id = id;js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";fjs.parentNode.insertBefore(js, fjs);}(document, 'script', 'facebook-jssdk'));</script>
+	
+	<!-- twitter of fb code -->
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+	
+	<?php echo $this->HtmlLogic->script('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');?>
 	<script>window.jQuery || document.write('<script type="text/javascript" src="<?php echo $this->webroot;?>js/jquery-1.7.2.min.js">\x3C/script>');</script>
 	
 	<?php echo $this->HtmlLogic->script('amplify.min'); ?>
