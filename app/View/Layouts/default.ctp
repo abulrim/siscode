@@ -13,7 +13,7 @@
 		<script src="https://raw.github.com/scottjehl/Respond/master/respond.min.js"></script>
 	<![endif]-->
 	<?php if (Configure::read('debug') == 0): ?>
-	<!-- Start of Woopra Code -->
+	<!-- Start of analytics code -->
 	<script type="text/javascript">
 		function woopraReady(tracker) {
 			tracker.setDomain('siscode.me');
@@ -29,6 +29,15 @@
 			wsc.async = true;
 			var ssc = document.getElementsByTagName('script')[0];
 			ssc.parentNode.insertBefore(wsc, ssc);
+		})();
+		
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-23314622-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		})();
 	</script>
 	<!-- End of Woopra Code -->
