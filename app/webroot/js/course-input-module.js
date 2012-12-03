@@ -876,6 +876,7 @@
 					title: document.title
 				});
 			}
+			window._gaq.push(['_trackPageview', '/c/' + d]);
 			
 			var data = [],
 				models,
