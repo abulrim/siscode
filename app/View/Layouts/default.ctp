@@ -41,6 +41,7 @@
 		})();
 	</script>
 	<!-- End of Woopra Code -->
+	<!-- Hi Woopra Ticket 15633 -->
 	<?php endif; ?>
 </head>
 <body data-cache_key="6" data-webroot="<?php echo $this->webroot; ?>">
