@@ -735,6 +735,7 @@ input {
     position: absolute;
     bottom: -40px;
     left: 335px;
+    font-size: 12px;
   }
   .social {
     float: left;

@@ -123,6 +123,7 @@
 		<div class="social twitter">
 			<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://siscode.me" data-text="Build your @AUB_Lebanon course schedule on" data-via="siscodeme">Tweet</a>
 		</div>
+		Last updated 30 April 2013 (Fall 2013-2014)
 	</div>
 </div>
 <div class="foot-bar">
