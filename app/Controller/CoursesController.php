@@ -1,38 +1,41 @@
 <?php
 class CoursesController extends AppController {
 	public $helpers = array('Cache');
-	
+
 	public function index() {
 		if (Configure::read('debug') == 0) {
 			$this->cacheAction = '+1 day';
 		}
-		$this->Course->Subject->contain(array(
-			'Course' => array(
+		$this->Course->Subject->Institution->contain(array(
+			'Subject' => array(
+				'order' => array(
+					'Subject.name' => 'ASC'
+				)
+			),
+			'Subject.Course' => array(
 				'fields' => array('DISTINCT Course.number')
 			)
 		));
-		$subjects = $this->Course->Subject->find('all', array(
-			'order' => array(
-				'Subject.name' => 'ASC'
-			)
-		));
-		$cleanedSubjects = array();
-		foreach($subjects as $subject) {
-			$cleanedSubject = array(
-				'id' => $subject['Subject']['id'],
-				'name' => $subject['Subject']['name'],
-				'code' => $subject['Subject']['code'],
-				'numbers' => array()
-			);
-			foreach($subject['Course'] as $courseNumber) {
-				$cleanedSubject['numbers'][] = $courseNumber['number'];
+		$institutions = $this->Course->Subject->Institution->find('all');
+
+		$cleanedArrays = array();
+		foreach($institutions as $institution) {
+			$cleanedArray = $institution['Institution'];
+			$subjects = $institution['Subject'];
+
+			$cleanSubjects = array();
+			foreach ($subjects as $subject) {
+				$subject['numbers'] = Hash::extract($subject, 'Course.{n}.number');
+				unset($subject['Course']);
+				$cleanSubjects[] = $subject;
 			}
-			$cleanedSubjects[] = $cleanedSubject;
+
+			$cleanedArray['subjects'] = $cleanSubjects;
+			$cleanedArrays[] = $cleanedArray;
 		}
-		$subjects = $cleanedSubjects;
-		$this->set(compact('subjects'));
+		$this->set('institutions', $cleanedArrays);
 	}
-	
+
 	public function fetch($data) {
 		$courses = array();
 		$inputs = array();
@@ -49,26 +52,26 @@ class CoursesController extends AppController {
 		$implodedDays = implode('-', $days);
 		$daysConditions = array();
 		$daysConditions = $this->_getDaysConditions($days);
-		
+
 		//Check if course combinations cached
 		$unsortedCombinedInputs = array();
-		
+
 		foreach($inputs as $key => $input) {
 			if (!empty($input['crn'])) {
 				$input['subject_id'] = $input['number'] = '';
 				$inputs[$key] = $input;
-			} 
+			}
 			if (empty($input['crn']) && empty($input['subject_id']) && empty($input['number'])) {
 				unset($inputs[$key]);
 			} else {
 				$unsortedCombinedInputs[] = implode('-', $input);
 			}
 		}
-		
+
 		$combinedInputs = Hash::sort($unsortedCombinedInputs, '{n}', 'asc');
 		$cacheName = $implodedDays . '_' . implode('_', $combinedInputs);
 		$cache = Cache::read($cacheName);
-		
+
 		if (!empty($inputs) && count($inputs) <= 7) {
 			if (!$cache) {
 				$popedInputs = 0;
@@ -157,7 +160,7 @@ class CoursesController extends AppController {
 				'page' => $page
 			)
 		);
-		
+
 		//server caching
 		$fileName = APP . 'webroot' . DS . 'courses' . DS . 'fetch' . DS . $data . '.json';
 		if (file_exists($fileName)) {
@@ -166,13 +169,13 @@ class CoursesController extends AppController {
 		$openedFile = fopen($fileName, 'w');
 		fwrite($openedFile, json_encode($content));
 		fclose($openedFile);
-		
+
 		$this->set(compact('content'));
 		$this->set('_serialize', 'content');
 	}
-	
+
 	protected function _getCombinations($inputs, $combinations = array()) {
-		
+
 		foreach($inputs as $input) {
 			$combinations = $this->_checkConflict($combinations, $input);
 			if (empty($combinations)) {
@@ -181,11 +184,11 @@ class CoursesController extends AppController {
 		}
 		return $combinations;
 	}
-	
+
 	//returns all the combinations between $combinations and $input
 	protected function _checkConflict($combinations, $input) {
 		$newCombination = array();
-		
+
 		//First run fill the combinations array with the first input
 		if (empty($combinations)) {
 			foreach ($input as $key => $el) {
@@ -204,7 +207,7 @@ class CoursesController extends AppController {
 		}
 		return $newCombination;
 	}
-	
+
 	//returns if time conflict occurs
 	protected function _isTimeConflict($combination, $course) {
 		foreach($combination as $el) {
@@ -215,7 +218,7 @@ class CoursesController extends AppController {
 						$firstEndTime = $courseSlot['end_time'];
 						$secondStartTime = $slot['start_time'];
 						$secondEndTime = $slot['end_time'];
-						
+
 						if (($firstStartTime <= $secondEndTime) && ($firstStartTime >= $secondStartTime)) {
 							return true;
 						} elseif (($firstEndTime <= $secondEndTime) && ($firstEndTime >= $secondStartTime)) {
@@ -229,7 +232,7 @@ class CoursesController extends AppController {
 		}
 		return false;
 	}
-	
+
 	protected function _getDaysConditions($requestedDays) {
 		$days = array('m', 't', 'w', 'r', 'f', 's');
 		$daysConditions = array();
@@ -241,35 +244,35 @@ class CoursesController extends AppController {
 		}
 		return $daysConditions;
 	}
-	
+
 	public function clear_cache($key) {
-		
+
 		if ($key != Configure::read('CacheKey')) {
 			exit('Not done!');
 		}
-		
+
 		//delete cached json courses
 		$mydir = APP . 'webroot' . DS . 'courses' . DS . 'fetch' . DS;
 		$this->_deleteFiles($mydir);
-		
+
 		//delete cached cake models
 		$mydir = APP . 'tmp' . DS . 'cache' . DS . 'models' . DS;
 		$this->_deleteFiles($mydir);
-		
+
 		//delete cached files in persistent
 		$mydir = APP . 'tmp' . DS . 'cache' . DS . 'persistent' . DS;
 		$this->_deleteFiles($mydir);
-		
+
 		//delete cached views
 		$mydir = APP . 'tmp' . DS . 'cache' . DS . 'views' . DS;
 		$this->_deleteFiles($mydir);
-		
-		
+
+
 		Cache::clear();
 		clearCache();
 		exit('Done!');
 	}
-	
+
 	protected function _deleteFiles($dir) {
 		foreach(glob($dir.'*') as $entry) {
 			$fileName = explode('/', $entry);
