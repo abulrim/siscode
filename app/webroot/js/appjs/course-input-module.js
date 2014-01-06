@@ -4,20 +4,19 @@
 (function ($, Backbone, _, H, amplify, undef) {
 	"use strict";
 
-
-  var App = window.App || {},
-			clickOrTouch = 'click',
+	var App = window.App || {},
+			CLICK_OR_TOUCH = 'click',
 			IS_MOBILE = navigator.userAgent.match(/mobile/i);
 
-  if (IS_MOBILE && 'ontouchstart' in document.documentElement) {
-    clickOrTouch = 'touchstart';
-  }
+	if (IS_MOBILE && 'ontouchstart' in document.documentElement) {
+		CLICK_OR_TOUCH = 'touchstart';
+	}
 
-  // -----------
-  // Institution
-  // -----------
+	// -----------
+	// Institution
+	// -----------
 
-  // App.InstitutionModel
+	// App.InstitutionModel
 	App.InstitutionModel = Backbone.Model.extend();
 
 	// App.InstitutionCollection
@@ -26,51 +25,54 @@
 	});
 
 	// App.InstitutionListView
-	// Fills subjects when institution select changes
+	// Calls router.institutionChanged when institution selected
 	App.InstitutionListView = Backbone.View.extend({
 
-		subjects: [],
 		template: H.compile($('#institutions-select').html()),
 
 		events: {
-			'change select[name=institution_id]': 'fillSubjects'
+			'change select[name=institution_id]': 'institutionChanged'
 		},
 
-		fillSubjects: function() {
+		institutionChanged: function() {
 			var modelId,
-				numbers,
 				selectedModel;
 
 			modelId = this.$('select[name=institution_id]').val();
 			if (modelId) {
-				selectedModel = MyInstitutionCollection.get(modelId).toJSON();
+				selectedModel = this.collection.get(modelId).toJSON();
 			} else {
 				selectedModel = {subjects:[]};
 			}
-			this.subjects = selectedModel.subjects;
+			this.trigger('institutionChanged', selectedModel);
 		},
 
-		initialize: function() {
+		initialize: function(options) {
+			this.collection = new App.InstitutionCollection(options.institutions),
 			this.collection.on('reset', this.render, this);
 		},
 
+		selectInstitution: function(institutionId) {
+			this.$('select[name=institution_id]').val(institutionId).trigger('change').trigger('chosen:updated');
+		},
+
 		render: function() {
-			var data = {
+			this.$el.html(this.template({
 				institutions: this.collection.toJSON()
-			};
-			this.$el.html(this.template(data));
+			}));
+
 			return this;
 		},
 
-    afterRender: function() {
-      this.$('select').chosen();
-    }
+		afterRender: function() {
+			this.$('select').chosen();
+		}
 
 	});
 
-  // -------
-  // Subject
-  // -------
+	// -------
+	// Subject
+	// -------
 
 	// App.SubjectModel
 	App.SubjectModel = Backbone.Model.extend();
@@ -80,9 +82,9 @@
 		model: App.SubjectModel
 	});
 
-  // -----------
-  // CourseInput
-  // -----------
+	// -----------
+	// CourseInput
+	// -----------
 
 	// App.CourseInputModel
 	App.CourseInputModel = Backbone.Model.extend();
@@ -95,7 +97,7 @@
 		className: 'cil-course-input',
 		template: H.compile($('#course-input-tmpl').html()),
 		numberTemplate: H.compile($('#course-input-numbers').html()),
-		subjects: [],
+		subjectCollection: null,
 
 		events: {
 			'change select[name=subject_id]': 'fillNumber',
@@ -106,9 +108,9 @@
 		// Disables subjects and numbers select when crn present
 		crnKeyUp: function(event) {
 			if(this.$(event.target).val().length > 0) {
-				this.$('select').prop('disabled', true).trigger('liszt:updated');
+				this.$('select').prop('disabled', true).trigger('chosen:updated');
 			} else {
-				this.$('select').prop('disabled', false).trigger('liszt:updated');
+				this.$('select').prop('disabled', false).trigger('chosen:updated');
 			}
 		},
 
@@ -120,19 +122,19 @@
 
 			modelId = this.$('select[name=subject_id]').val();
 			if (modelId) {
-				selectedModel = MySubjectCollection.get(modelId).toJSON();
+				selectedModel = this.subjectCollection.get(modelId).toJSON();
 			} else {
 				selectedModel = {numbers:[]};
 			}
 			this.$('select[name=number]').html(this.numberTemplate(selectedModel))
-			.trigger('liszt:updated');
+			.trigger('chosen:updated');
 		},
 
 		render: function() {
-			var view, data;
+			var view, 
+				data = this.model.toJSON();
 
-			data = this.model.toJSON();
-			data.subjects = this.subjects;
+			data.subjects = this.subjectCollection.toJSON();
 			this.$el.html(this.template(data))
 			.find('select[name=subject_id]').val(this.model.get('subject_id')).trigger('change')
 			.end()
@@ -145,8 +147,9 @@
 			this.$('select').chosen();
 		},
 
-		initialize: function() {
-			this.model.on('destroy', this.remove, this);
+		initialize: function(options) {
+			this.subjectCollection = new App.SubjectCollection(options.subjects);
+			this.model.on('remove', this.remove, this);
 		},
 
 		removeCourse: function() {
@@ -161,19 +164,16 @@
 
 	// App.CourseInputListView
 	// updates the URL by calling the router and fills the courses
-	// needs institutionListView, courseInputView
+	// needs insitutions and router
 	App.CourseInputListView = Backbone.View.extend({
 		el: '.cil',
 		institutionListView: null,
-		CourseInputModel: null,
-		CourseInputView: null,
-		// institution: null,
-
-		page: 0,
+		collection: new App.CourseInputCollection(),
+		institution: null,
 		closed: false,
 
 		events: {
-			'keypress .course-input' : 'keyLog'
+			'keypress .course-input': 'keyLog'
 		},
 
 		keyLog: function(e) {
@@ -182,36 +182,45 @@
 			}
 		},
 
-		initialize: function() {
-			this.addInstitutions();
-			// this.institutionChanged();
+		initialize: function(options) {
+			this.router = options.router;
+			this.initInstitutionListView(options);
+			this.afterRender();
+
 			this.collection.on('add', this.addInput, this);
-			this.collection.on('reset', this.closeInputs, this);
-			// MyAppView.on('leftArrowUp', this.updatePrevious, this);
-			// MyAppView.on('rightArrowUp', this.updateNext, this);
+			this.collection.on('reset', this.collectionReset, this);
+			this.router.on('urlChanged', this.dehasherize, this)
 		},
 
-		addInstitutions: function() {
-			this.$('.cil-institutions').html(this.institutionListView.render().$el);
-			this.institutionListView.afterRender();
+		initInstitutionListView: function(options) {
+			var institutionListView = new App.InstitutionListView({
+				institutions: options.institutions
+			});
+
+			this.$('.cil-institutions').html(institutionListView.render().$el);
+			institutionListView.afterRender();
+
+			institutionListView.on('institutionChanged', this.institutionChanged, this);
+
+			this.institutionListView = institutionListView;
+			this.institutionChanged();
 		},
 
-		// institutionChanged: function(newInstitution) {
-		// 	this.institution = newInstitution;
-		// 	if (this.institution != null) {
-		// 		this.collection.add([new CourseInputModel(), new CourseInputModel()]);
-		// 		this.$('.cil-add-course').show();
-		// 	} else {
-		// 		this.$('.cil-add-course').hide();
-		// 	}
-		// },
-
-		updatePrevious: function() {
-			this.updateUrl(-1);
+		institutionChanged: function(newInstitution) {
+			this.institution = newInstitution;
+			this.collection.reset();
+			if (this.institution != null) {
+				this.$('.cil-add-course').show();
+			} else {
+				this.$('.cil-add-course').hide();
+			}
 		},
 
-		updateNext: function() {
-			this.updateUrl(1);
+		collectionReset: function(collection, options) {
+			_.each(options.previousModels, function(model) {
+		        model.trigger('remove');
+		    });
+			this.closeInputs();
 		},
 
 		closeInputs: function() {
@@ -225,11 +234,13 @@
 		},
 
 		addInput: function(model) {
-			var view, $viewEl;
-			view = new this.CourseInputView({model:model});
+			var view;
+			view = new App.CourseInputView({ 
+				model: model,
+				subjects: this.institution.subjects
+			});
 			view.render();
-			$viewEl = view.$el;
-			this.$('.cil-courses').append($viewEl);
+			this.$('.cil-courses').append(view.$el);
 			view.afterRender();
 		},
 
@@ -237,7 +248,8 @@
 		// in which the view elem will become active if click event
 		// is used by default backbone events
 		afterRender: function() {
-			var self = this, event;
+			var self = this;
+
 			this.$('.cil-add-course').on('click', function() {
 				self.addInputModel();
 			});
@@ -246,11 +258,7 @@
 				self.updateUrlEvent();
 			});
 
-			event = 'click';
-			if (IS_MOBILE) {
-				event = 'touchstart';
-			}
-			this.$('.cil-expand-arrow').on(event, function() {
+			this.$('.cil-expand-arrow').on(CLICK_OR_TOUCH, function() {
 				self.openInputs();
 				return false;
 			});
@@ -259,7 +267,7 @@
 		},
 
 		addInputModel: function() {
-			this.collection.add(new this.CourseInputModel());
+			this.collection.add(new App.CourseInputModel());
 		},
 
 		updateUrlEvent: function(){
@@ -268,48 +276,93 @@
 		},
 
 		updateUrl: function(action) {
+			var props = this.getProps();
 
-			if (action === undef) {
-				this.page = 1;
-			} else if(action === -1) {
-				this.page -= 1;
-			} else if (action === 1) {
-				if (this.page < MyCourseCollection.maxPage) {
-					this.page += 1;
-				}
-			}
-			this.page = Math.max(1, this.page);
-			var data = [], url = '', days = [], val;
+			this.router.handleUrl({
+				page: 1,
+				institution: this.institution,
+				days: props.days,
+				courses: props.courses
+			});
+		},
+
+		getProps: function() {
+			var courses = [],
+				days = [];
+
+			// Fill courses
 			this.$('.cil-course-input').each(function() {
-				data.push([
-					$(this).find('select[name=subject_id]').val(),$(this).find('select[name=number]').val(),$(this).find('input[name=crn]').val()
-				]);
+				courses.push({
+					subject: $(this).find('select[name=subject_id]').val(),
+					number: $(this).find('select[name=number]').val(),
+					crn: $(this).find('input[name=crn]').val()
+				});
 			});
-			_.each(data, function(item) {
-				url = url + item.join('-') + '_';
-			});
+
+			// Fill days
 			$('input[name^="filter"]').each(function(){
 				if ($(this).prop('checked')) {
 					days.push($(this).val());
 				}
 			});
-			days = days.join('-') + '_';
-			url = 'c/' + this.page + '_' + days + url.substr(0, url.length-1);
 
-			MyAppRouter.navigate(url, {trigger: true});
+			return {
+				courses: courses,
+				days: days
+			}
+		},
+
+		// {institution}_{page}_{days separated by '-'}_{subject-number-crn}
+		dehasherize: function(hash) {
+			var data = [],
+				array,
+				days,
+				page,
+				institution,
+				self = this,
+				props;
+
+			data = hash.split('_');
+
+			institution = data.splice(0, 1)[0];
+			page = data.splice(0, 1)[0];
+			days = data.splice(0, 1)[0].split('-');
+
+			this.institutionListView.selectInstitution(institution);
+			this.updateFilters(days);
+
+			this.collection.reset();
+			_.each(data, function(course, key) {
+				array = course.split('-');
+				self.collection.add(new App.CourseInputModel({
+					subject_id: array[0],
+					number: array[1],
+					crn: array[2]
+				}));
+			});
+
+			props = this.getProps();
+
+			this.router.updateProps({
+				page: page,
+				institution: this.institution,
+				days: props.days,
+				courses: props.courses
+			});
 		},
 
 		updateFilters: function(days) {
-			var $boxes, self;
-			self = this;
-			$boxes = self.$('input[name^="filter"]');
+			var $boxes = this.$('input[name^="filter"]'), 
+				self = this;
+
 			$boxes.prop('checked', false);
 
 			_.each(days, function(day) {
 				self.$('input[name="filter[' + day + ']"]').prop('checked', true);
 			});
 		}
-
 	});
+	
+	window.App = App;
 
 }(jQuery, Backbone, _, Handlebars, amplify));

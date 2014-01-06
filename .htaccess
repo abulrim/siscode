@@ -1,10 +1,10 @@
 <IfModule mod_rewrite.c>
-   RewriteEngine on
+	RewriteEngine on
 	
 	RewriteCond %{HTTP_HOST} ^www\.siscode\.me$
-  RewriteRule ^(.*)$ http://siscode.me/$1 [R=permanent,L]
+	RewriteRule ^(.*)$ http://siscode.me/$1 [R=permanent,L]
 
 	RewriteRule    ^$ app/webroot/    [L]
-   RewriteRule    (.*) app/webroot/$1 [L]
+	RewriteRule    (.*) app/webroot/$1 [L]
 </IfModule>
 

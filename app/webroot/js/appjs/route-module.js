@@ -13,21 +13,69 @@
   // Our Router handles everything related to url change and fires corresponding
   // events.
   // Call App.Router.navigate(url) to change url and fire backend courses fetch
-  // Needs courseInputCollection and courseCollection
+  // Needs courseInputListView and courseCollection
   //
   App.Router = Backbone.Router.extend({
-    courseInputCollection: null,
-    courseCollection: null,
+    page: 1,
+    maxPage: 1,
+    institution: null,
+    days: null,
+    courses: null,
 
     url: '',
 
     routes: {
-      'c/:hash': 'handleUrl'
+      'c/:hash': 'urlChanged'
     },
 
-    // Reads the url, calls courseInputCollection to update inputs
+    nextPage: function() {
+      if (+this.page !== +this.maxPage) {
+        this.page++;
+        this.handleUrl();
+      }
+    },
+
+    previousPage: function() {
+      if (+this.page !== 1) {
+        this.page--;
+        this.handleUrl();
+      }
+    },
+
+    updateProps: function(options) {
+      if (typeof options !== "undefined") {
+        this.page = options.page;
+        this.institution = options.institution;
+        this.days = options.days;
+        this.courses = options.courses;
+      }
+    },
+
+    handleUrl: function(options) {
+      var hash,
+          coursesHash = [];
+
+      this.updateProps(options);
+
+      _.each(this.courses, function(course){
+        coursesHash.push(course.subject + '-' + course.number + '-' + course.crn);
+      });
+
+      hash = [
+        this.institution.id, 
+        this.page, 
+        this.days.join('-'),
+        coursesHash.join('_')
+      ].join('_');
+
+      this.navigate('c/' + hash, { trigger: true });
+    },
+
+    // Reads the url, calls courseInputListView to update inputs
     // and courseCollection to fetch new courses
-    handleUrl: function(hash) {
+    urlChanged: function(hash) {
+      this.trigger('urlChanged', hash);
+      this.url = hash;
 
       // Handle woopra and google analytics
       window.woopraTracker.trackPageview({
@@ -35,37 +83,9 @@
         title: document.title
       });
       window._gaq.push(['_trackPageview', '/c/' + hash]);
-
-      var data = [],
-          models,
-          array,
-          days,
-          page,
-          joinedCourses = [],
-          url;
-
-      // url formatted as such:
-      // {page}_{days separated by '-'}_{subject-number-crn}
-      data = hash.split('_');
-      page = data.splice(0, 1);
-      page = page[0];
-      days = data.splice(0, 1);
-      days = days[0].split('-');
-      _.each(data, function(item, key) {
-        array = item.split('-');
-        data[key] = {
-          subject_id: array[0],
-          number: array[1],
-          crn: array[2]
-        };
-      });
-
-      this.url = hash;
-
-      // Fire events here
-      this.courseInputCollection.update(data);
-      this.courseCollection.fetchNew(data);
     }
   });
+  
+  window.App = App;
 
 }(Backbone, _));

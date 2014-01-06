@@ -40,9 +40,10 @@ class CoursesController extends AppController {
 		$courses = array();
 		$inputs = array();
 		$urlData = explode('_', $data);
-		$page = $urlData[0];
-		$days = explode('-', $urlData[1]);
-		$urlData = array_slice($urlData, 2);
+		$institution = $urlData[0];
+		$page = $urlData[1];
+		$days = explode('-', $urlData[2]);
+		$urlData = array_slice($urlData, 3);
 		foreach($urlData as $key => $course) {
 			$exploded = explode('-', $course);
 			$inputs[$key]['subject_id'] = $exploded[0];
@@ -69,7 +70,7 @@ class CoursesController extends AppController {
 		}
 
 		$combinedInputs = Hash::sort($unsortedCombinedInputs, '{n}', 'asc');
-		$cacheName = $implodedDays . '_' . implode('_', $combinedInputs);
+		$cacheName = $institution . '_' . $implodedDays . '_' . implode('_', $combinedInputs);
 		$cache = Cache::read($cacheName);
 
 		if (!empty($inputs) && count($inputs) <= 7) {
@@ -85,11 +86,13 @@ class CoursesController extends AppController {
 						);
 					} else {
 						$conditions = array(
+							'Subject.institution_id' => $institution,
 							'Course.crn' => $input['crn']
 						);
 					}
 
 					$this->Course->contain(array(
+						'Subject',
 						'CourseSlot' => array(
 							'Instructor'
 						)
@@ -126,9 +129,9 @@ class CoursesController extends AppController {
 				if ($page > $count) {
 					$courses = array();
 				} else {
-
 					$courseIds = $cache[$page - 1];
 					$this->Course->contain(array(
+						'Subject',
 						'CourseSlot' => array(
 							'Instructor'
 						)

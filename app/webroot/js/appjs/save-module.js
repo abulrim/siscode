@@ -2,236 +2,282 @@
 /*globals jQuery,Backbone,Handlebars,_, undefined, FB*/
 
 (function ($, Backbone, _, H, amplify, undef) {
-  "use strict";
+	"use strict";
 
-  /**** third module  ****/
-  SavedModel = Backbone.Model.extend({
-    defaults: {
-      url: null,
-      name: null
-    },
+	var App = window.App || {},
+			CLICK_OR_TOUCH = 'click',
+			IS_MOBILE = navigator.userAgent.match(/mobile/i);
 
-    sync: function(method, model, options) {
-      var combinations, createdModel, modelId, index;
-      if (method === 'create') {
-        combinations = amplify.store( "savedCombinations");
-        if (!combinations) {
-          combinations = [];
-        }
-        createdModel = this.toJSON();
-        createdModel.id = _.uniqueId();
-        combinations.push(createdModel);
-        amplify.store("savedCombinations", combinations);
-        options.success(createdModel);
-      } else if(method === 'delete') {
-        modelId = model.get("id");
-        combinations = amplify.store("savedCombinations", combinations);
-        index = null;
-        _.each(combinations, function(combination, key) {
-          if (combination.id === modelId) {
-            index = key;
-            return false;
-          }
-        });
-        if (index !== null) {
-          combinations.splice(index, 1);
-        }
-        amplify.store( "savedCombinations", combinations);
-      } else if (method === 'update') {
-        modelId = model.get("id");
-        combinations = amplify.store("savedCombinations", combinations);
-        index = null;
-        _.each(combinations, function(combination, key) {
-          if (combination.id === modelId) {
-            combinations[key] = model.toJSON();
-            return false;
-          }
-        });
-        amplify.store( "savedCombinations", combinations);
-      }
-    },
+	if (IS_MOBILE && 'ontouchstart' in document.documentElement) {
+		CLICK_OR_TOUCH = 'touchstart';
+	}
 
-    clear: function() {
-      this.destroy();
-    }
-  });
+	// -----
+	// Saved
+	// -----
 
-  SavedView = Backbone.View.extend({
-    tagName: 'li',
+	// App.SavedModel
+	App.SavedModel = Backbone.Model.extend({
+		defaults: {
+			url: null,
+			name: null
+		},
 
-    editMode: false,
+		sync: function(method, model, options) {
+			var combinations, 
+				createdModel, 
+				modelId, 
+				index;
 
-    $template: H.compile($('#foot-bar-combination-tmpl').html()),
+			if (method === 'create') {
+				combinations = amplify.store("savedCombinations");
+				if (!combinations) {
+					combinations = [];
+				}
+				createdModel = this.toJSON();
+				createdModel.id = _.uniqueId();
+				combinations.push(createdModel);
+				amplify.store("savedCombinations", combinations);
+				options.success(createdModel);
+			} else if(method === 'delete') {
+				modelId = model.get("id");
+				combinations = amplify.store("savedCombinations", combinations);
+				index = null;
+				_.each(combinations, function(combination, key) {
+					if (combination.id === modelId) {
+						index = key;
+						return false;
+					}
+				});
+				if (index !== null) {
+					combinations.splice(index, 1);
+				}
+				amplify.store("savedCombinations", combinations);
+			} else if (method === 'update') {
+				modelId = model.get("id");
+				combinations = amplify.store("savedCombinations", combinations);
+				index = null;
+				_.each(combinations, function(combination, key) {
+					if (combination.id === modelId) {
+						combinations[key] = model.toJSON();
+						return false;
+					}
+				});
+				amplify.store("savedCombinations", combinations);
+			}
+		},
 
+		clear: function() {
+			this.destroy();
+		}
+	});
 
-    events: function() {
-        var event = {};
-        event[clickOrTouch + ' a'] = 'goToSavedUrl';
-        event[clickOrTouch + ' .foot-bar-remove'] = 'removeCombination';
-        event[clickOrTouch + ' .foot-bar-edit'] = 'editCombination';
-        event['keypress input'] = 'updateCombination';
-        return event;
-    },
+	// App.SavedView
+	App.SavedView = Backbone.View.extend({
+		tagName: 'li',
+		router: null,
+		editMode: false,
 
-    editCombination: function() {
-      if (this.editMode) {
-        this.update();
-      } else {
-        this.editMode = true;
-        this.$('.foot-bar-combination-name').hide();
-        this.$('input').show().focus().select();
-      }
-      return false;
-    },
+		template: H.compile($('#foot-bar-combination-tmpl').html()),
 
-    updateCombination: function(e) {
-      if (e.keyCode === 13) {
-        this.update();
-      }
-    },
+		initialize: function(options) {
+			this.router = options.router;
+			this.webroot = options.webroot;
+			this.model.on('destroy', this.remove, this);
+			this.model.on('change:name', this.render, this);
+		},
 
-    update: function() {
-      var newName;
-      this.$('.foot-bar-combination-name').show();
-      newName = this.$('input').hide().val();
-      this.model.save({name: newName});
-      this.editMode = false;
+		events: function() {
+			var events = {};
+			events[CLICK_OR_TOUCH + ' a'] = 'goToSavedUrl';
+			events[CLICK_OR_TOUCH + ' .foot-bar-remove'] = 'removeCombination';
+			events[CLICK_OR_TOUCH + ' .foot-bar-edit'] = 'editCombination';
+			events['keypress input'] = 'updateCombination';
+			return events;
+		},
 
-      if(window.woopraTracker) {
-        window.woopraTracker.pushEvent({
-          name: 'edit',
-          url: window.location.origin + webroot + 'c/' + this.model.get('url'),
-          title: newName
-        });
-      }
-    },
+		editCombination: function() {
+			if (this.editMode) {
+				this.update();
+			} else {
+				this.editMode = true;
+				this.$('.foot-bar-combination-name').hide();
+				this.$('input').show().focus().select();
+			}
+			return false;
+		},
 
-    removeCombination: function() {
-      if(window.woopraTracker) {
-        window.woopraTracker.pushEvent({
-          name: 'delete',
-          url: window.location.origin + webroot + 'c/' + this.model.get('url'),
-          title: this.model.get('name')
-        });
-      }
-      this.model.clear();
-      return false;
-    },
+		updateCombination: function(e) {
+			if (e.keyCode === 13) {
+				this.update();
+			}
+		},
 
-    goToSavedUrl: function() {
-      MyAppRouter.navigate('c/' + this.model.get("url"), {trigger: true});
-      return false;
-    },
+		update: function() {
+			var newName;
+			this.$('.foot-bar-combination-name').show();
+			newName = this.$('input').hide().val();
+			this.model.save({ name: newName });
+			this.editMode = false;
 
-    initialize: function() {
-      this.model.on('destroy', this.remove, this);
-      this.model.on('change:name', this.render, this);
-    },
+			window.woopraTracker.pushEvent({
+				name: 'edit',
+				url: window.location.origin + this.webroot + 'c/' + this.model.get('url'),
+				title: newName
+			});
+		},
 
-    render: function() {
-      this.$el.html(this.$template(this.model.toJSON()));
-      return this;
-    }
-  });
+		removeCombination: function() {
+			window.woopraTracker.pushEvent({
+				name: 'delete',
+				url: window.location.origin + this.webroot + 'c/' + this.model.get('url'),
+				title: this.model.get('name')
+			});
+			this.model.clear();
+			return false;
+		},
 
-  SavedCollection = Backbone.Collection.extend({
-    model: SavedModel,
+		goToSavedUrl: function() {
+			this.router.navigate('c/' + this.model.get("url"), { trigger: true });
+			return false;
+		},
 
-    sync: function(method, collection, options) {
-      if (method === 'read') {
-        var savedCombinations;
-        savedCombinations = amplify.store( "savedCombinations");
-        options.success(savedCombinations);
-      }
-    }
-  });
+		render: function() {
+			this.$el.html(this.template(this.model.toJSON()));
+			return this;
+		}
+	});
 
-  SavedCollectionView = Backbone.View.extend({
-    el: '.foot-bar',
-    toggled: false,
+	// App.SavedCollection
+	App.SavedCollection = Backbone.Collection.extend({
+		model: App.SavedModel,
 
-    events: function() {
-      var events = IS_MOBILE ? {
-          'touchstart .foot-bar-toggle': 'toggleFoot',
-          'touchstart .foot-bar-add': 'save'
-        }:{
-          'click .foot-bar-toggle': 'toggleFoot',
-          'click .foot-bar-add': 'save'
-      };
-      return events;
-    },
+		sync: function(method, collection, options) {
+			if (method === 'read') {
+				var savedCombinations = amplify.store("savedCombinations");
+				options.success(savedCombinations);
+			}
+		}
+	});
 
-    initialize: function() {
-      this.collection.on('add', this.addOne, this);
-      this.collection.on('reset', this.addAll, this);
-    },
+	// App.SavedCollectionView
+	App.SavedCollectionView = Backbone.View.extend({
+		el: '.foot-bar',
+		toggled: false,
+		router: null,
+		webroot: null,
+		courseCollection: null,
+		collection: new App.SavedCollection(),
 
-    addAll: function(collection) {
-      var self;
-      self = this;
-      _.each(collection.models, function(model) {
-        self.addSaved(model, true);
-      });
-    },
+		events: function() {
+			var events = IS_MOBILE ? {
+				'touchstart .foot-bar-toggle': 'toggleFoot',
+				'touchstart .foot-bar-add': 'save'
+			}:{
+				'click .foot-bar-toggle': 'toggleFoot',
+				'click .foot-bar-add': 'save'
+			};
+			return events;
+		},
 
-    addOne: function(model) {
-      this.addSaved(model);
-    },
+		initialize: function(options) {
+			this.router = options.router;
+			this.webroot = options.webroot;
+			this.courseCollection = options.courseCollection;
+			this.collection.on('add', this.addOne, this);
+			this.collection.on('reset', this.addAll, this);
+			this.collection.fetch({ reset: true });
+		},
 
-    addSaved: function(model, ignore) {
-      var view, $viewEl;
-      view = new SavedView({model:model});
-      view.render();
-      $viewEl = view.$el;
-      this.$('.foot-bar-combination').prepend($viewEl);
-      if (!ignore) {
-        view.editCombination();
-        if (!this.toggled) {
-          this.toggleFoot();
-        }
-      }
-    },
+		addAll: function(collection) {
+			var self = this;
 
-    toggleFoot: function() {
-      var arrow;
-      arrow = this.$('.foot-bar-arrow');
-      if (this.toggled === false) {
-        this.$el.addClass('toggled');
-        arrow.addClass('down');
-        this.toggled = true;
-      } else {
-        this.$el.removeClass('toggled');
-        arrow.removeClass('down');
-        this.toggled = false;
-      }
-      return false;
-    },
+			_.each(collection.models, function(model) {
+				self.addSaved(model, true);
+			});
+		},
 
-    save: function() {
-      if (this.collection.where({url: MyAppRouter.url}).length === 0 && MyAppRouter.url.length !== 0) {
-        var link = '';
+		addOne: function(model) {
+			this.addSaved(model);
+		},
 
-        _.each(MyCourseCollection.models, function(model) {
-          link = link + model.get("crn") + ' (' + model.get("subject_code") + ' ' + model.get("number") + ')' + ' - ';
-        });
-        link = link + '(page: ' + MyCourseInputListView.page + ')';
+		addSaved: function(model, ignore) {
+			var view, 
+				$viewEl;
 
-        if(window.woopraTracker) {
-          window.woopraTracker.pushEvent({
-            name: 'save',
-            url: window.location.href,
-            title: link
-          });
-        }
+			view = new App.SavedView({
+				router: this.router,
+				webroot: this.webroot,
+				model: model
+			});
+			view.render();
 
-        this.collection.create({url: MyAppRouter.url, name: link});
-      }
-    }
-  });
+			$viewEl = view.$el;
+			this.$('.foot-bar-combination').prepend($viewEl);
+			if (!ignore) {
+				view.editCombination();
+				if (!this.toggled) {
+					this.toggleFoot();
+				}
+			}
+		},
 
-  MySavedCollection = new SavedCollection();
-  MySavedCollectionView = new SavedCollectionView({collection:MySavedCollection});
-  MySavedCollection.fetch();
-  /***** End of the third module ****/
+		toggleFoot: function() {
+			var arrow;
+
+			arrow = this.$('.foot-bar-arrow');
+			if (this.toggled === false) {
+				this.$el.addClass('toggled');
+				arrow.addClass('down');
+				this.toggled = true;
+			} else {
+				this.$el.removeClass('toggled');
+				arrow.removeClass('down');
+				this.toggled = false;
+			}
+			return false;
+		},
+
+		crnHash: function() {
+			var hash,
+				coursesHash = [];
+
+			_.each(this.courseCollection.models, function(course){
+				coursesHash.push('--' + course.get('crn'));
+			});
+
+			hash = [
+				this.router.institution.id, 
+				this.router.page, 
+				this.router.days.join('-'),
+				coursesHash.join('_')
+			].join('_');
+
+			return hash;
+		},
+
+		save: function() {
+			if (this.collection.where({url: this.router.url}).length === 0 && this.router.url.length !== 0) {
+				var link = '';
+
+				_.each(this.courseCollection.models, function(model, key) {
+					if (key !== 0) {
+						link += ' - ';
+					}
+					link += model.get("crn") + ' (' + model.get("subject_code") + ' ' + model.get("number") + ')';
+				});
+
+				window.woopraTracker.pushEvent({
+					name: 'save',
+					url: window.location.href,
+					title: link
+				})
+
+				this.collection.create({ url: this.crnHash(), name: link });
+			}
+		}
+	});
+
+	window.App = App;
 
 }(jQuery, Backbone, _, Handlebars, amplify));

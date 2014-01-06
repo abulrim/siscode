@@ -72,11 +72,12 @@
 	<?php echo $this->HtmlLogic->script(array(
 		'jquery.tooltip',
 		'underscore-min',
-		'chosen.jquery',
+		'chosen.jquery.min',
 		'handlebars-v1.2.0',
-		'backbone',
+		'backbone.min',
 
 		'appjs/helpers',
+		'appjs/app-module',
 		'appjs/course-input-module',
 		'appjs/schedule-module',
 		'appjs/save-module',
