@@ -1,10 +1,10 @@
 /*jslint browser:true,devel:true,white:true,nomen:true,bad_new:true*/
 /*globals jQuery,Backbone,Handlebars,_, undefined, FB*/
 
-(function ($, Backbone, _, H, amplify, undef) {
+(function ($, Backbone, undef) {
 	"use strict";
 
-	var App = window.App || {};
+	var App = window.App || (window.App = {});
 
 	// ----------
 	// App module
@@ -32,6 +32,4 @@
 		}
 	});
 
-	window.App = App;
-
-}(jQuery, Backbone, _, Handlebars, amplify));
+}(jQuery, Backbone, amplify));

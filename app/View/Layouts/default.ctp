@@ -54,7 +54,7 @@
 	<?php endif; ?>
 
 </head>
-<body data-cache_key="6" data-webroot="<?php echo $this->webroot; ?>">
+<body data-cache_key="<?php echo Configure::read('CacheKey'); ?>" data-webroot="<?php echo $this->webroot; ?>">
 	<?php echo $this->fetch('content'); ?>
 
 	<!-- fb code -->
@@ -73,7 +73,7 @@
 		'jquery.tooltip',
 		'underscore-min',
 		'chosen.jquery.min',
-		'handlebars-v1.2.0',
+		'handlebars-v1.3.0.min',
 		'backbone.min',
 
 		'appjs/helpers',

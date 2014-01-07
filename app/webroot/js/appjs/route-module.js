@@ -4,7 +4,7 @@
 (function (Backbone, _, undef) {
   "use strict";
 
-  var App = window.App || {};
+  var App = window.App || (window.App = {});
 
   // ----------
   // App.Router
@@ -62,8 +62,8 @@
       });
 
       hash = [
-        this.institution.id, 
-        this.page, 
+        this.institution.id,
+        this.page,
         this.days.join('-'),
         coursesHash.join('_')
       ].join('_');
@@ -85,7 +85,5 @@
       window._gaq.push(['_trackPageview', '/c/' + hash]);
     }
   });
-  
-  window.App = App;
 
 }(Backbone, _));

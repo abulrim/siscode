@@ -4,7 +4,7 @@
 (function ($, Backbone, _, H, amplify, undef) {
 	"use strict";
 
-	var App = window.App || {};
+	var App = window.App || (window.App = {});
 
 	// ----------
 	// CourseSlot
@@ -63,6 +63,7 @@
 		page: 0,
 		webroot: null,
 		router: null,
+		cacheKey: 0,
 
 		// Each course has a specific color
 		colors: [
@@ -95,6 +96,7 @@
 		initialize: function(options) {
 			this.webroot = options.webroot;
 			this.router = options.router;
+			this.cacheKey = options.cacheKey;
 
 			this.on('reset', this.fixSlots, this);
 			this.router.on('urlChanged', this.fetchUrl, this);
@@ -103,7 +105,7 @@
 		fetchUrl: function(hash) {
 			var self = this;
 
-			this.url = this.webroot + 'courses/fetch/' + hash;
+			this.url = this.webroot + 'courses/fetch/' + hash + '.json?_=' + this.cacheKey;
 			this.trigger('isLoading', true);
 			this.reset();
 			this.fetch({
@@ -116,8 +118,8 @@
 
 		// Here we assign a color to each course and put the course info inside the course slots
 		fixSlots: function(collection) {
-			var courseSlot, 
-				self = this, 
+			var courseSlot,
+				self = this,
 				color;
 
 			_.each(collection.models, function(model, key) {
@@ -143,10 +145,10 @@
 			this.maxPage = this.router.maxPage = response.pagination.total;
 			this.page = this.router.page = response.pagination.page;
 
-			// The reponse that we get from the server has 'status' and 'content', inside content we have 
+			// The reponse that we get from the server has 'status' and 'content', inside content we have
 			// an array that has 'Course' and 'CourseSlot'
 			_.each(response.content, function(item) {
-				var courseSlotModels = [], 
+				var courseSlotModels = [],
 					modelData;
 
 				_.each(item.CourseSlot, function(courseSlotData) {
@@ -187,15 +189,16 @@
 
 			this.collection = new App.CourseCollection({
 				webroot: options.webroot,
-				router: options.router
+				router: options.router,
+				cacheKey: options.cacheKey
 			});
 			this.collection.on('reset', this.addAll, this);
 			this.collection.on('isLoading', this.loading, this);
 			this.$('.paginator').each(function() {
-				$(this).html((new App.PaginationView({ 
+				$(this).html((new App.PaginationView({
 					router: options.router,
 					collection: self.collection
-				 })).render().$el);
+				})).render().$el);
 			});
 		},
 
@@ -307,7 +310,5 @@
 			return this;
 		}
 	});
-
-	window.App = App;
 
 }(jQuery, Backbone, _, Handlebars, amplify));

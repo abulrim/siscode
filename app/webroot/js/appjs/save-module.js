@@ -4,7 +4,7 @@
 (function ($, Backbone, _, H, amplify, undef) {
 	"use strict";
 
-	var App = window.App || {},
+	var App = window.App || (window.App = {}),
 			CLICK_OR_TOUCH = 'click',
 			IS_MOBILE = navigator.userAgent.match(/mobile/i);
 
@@ -24,9 +24,9 @@
 		},
 
 		sync: function(method, model, options) {
-			var combinations, 
-				createdModel, 
-				modelId, 
+			var combinations,
+				createdModel,
+				modelId,
 				index;
 
 			if (method === 'create') {
@@ -202,7 +202,7 @@
 		},
 
 		addSaved: function(model, ignore) {
-			var view, 
+			var view,
 				$viewEl;
 
 			view = new App.SavedView({
@@ -247,8 +247,8 @@
 			});
 
 			hash = [
-				this.router.institution.id, 
-				this.router.page, 
+				this.router.institution.id,
+				1,
 				this.router.days.join('-'),
 				coursesHash.join('_')
 			].join('_');
@@ -271,13 +271,11 @@
 					name: 'save',
 					url: window.location.href,
 					title: link
-				})
+				});
 
 				this.collection.create({ url: this.crnHash(), name: link });
 			}
 		}
 	});
-
-	window.App = App;
 
 }(jQuery, Backbone, _, Handlebars, amplify));

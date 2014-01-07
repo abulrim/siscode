@@ -4,7 +4,7 @@
 (function ($, Backbone, _, H, amplify, undef) {
 	"use strict";
 
-	var App = window.App || {},
+	var App = window.App || (window.App = {}),
 			CLICK_OR_TOUCH = 'click',
 			IS_MOBILE = navigator.userAgent.match(/mobile/i);
 
@@ -48,7 +48,7 @@
 		},
 
 		initialize: function(options) {
-			this.collection = new App.InstitutionCollection(options.institutions),
+			this.collection = new App.InstitutionCollection(options.institutions);
 			this.collection.on('reset', this.render, this);
 		},
 
@@ -105,6 +105,11 @@
 			'keyup .cil-course-crn': 'crnKeyUp'
 		},
 
+		initialize: function(options) {
+			this.subjectCollection = new App.SubjectCollection(options.subjects);
+			this.model.on('remove', this.remove, this);
+		},
+
 		// Disables subjects and numbers select when crn present
 		crnKeyUp: function(event) {
 			if(this.$(event.target).val().length > 0) {
@@ -131,7 +136,7 @@
 		},
 
 		render: function() {
-			var view, 
+			var view,
 				data = this.model.toJSON();
 
 			data.subjects = this.subjectCollection.toJSON();
@@ -145,11 +150,6 @@
 
 		afterRender: function() {
 			this.$('select').chosen();
-		},
-
-		initialize: function(options) {
-			this.subjectCollection = new App.SubjectCollection(options.subjects);
-			this.model.on('remove', this.remove, this);
 		},
 
 		removeCourse: function() {
@@ -189,7 +189,7 @@
 
 			this.collection.on('add', this.addInput, this);
 			this.collection.on('reset', this.collectionReset, this);
-			this.router.on('urlChanged', this.dehasherize, this)
+			this.router.on('urlChanged', this.dehasherize, this);
 		},
 
 		initInstitutionListView: function(options) {
@@ -209,7 +209,7 @@
 		institutionChanged: function(newInstitution) {
 			this.institution = newInstitution;
 			this.collection.reset();
-			if (this.institution != null) {
+			if (this.institution !== null) {
 				this.$('.cil-add-course').show();
 			} else {
 				this.$('.cil-add-course').hide();
@@ -218,8 +218,8 @@
 
 		collectionReset: function(collection, options) {
 			_.each(options.previousModels, function(model) {
-		        model.trigger('remove');
-		    });
+				model.trigger('remove');
+			});
 			this.closeInputs();
 		},
 
@@ -235,7 +235,7 @@
 
 		addInput: function(model) {
 			var view;
-			view = new App.CourseInputView({ 
+			view = new App.CourseInputView({
 				model: model,
 				subjects: this.institution.subjects
 			});
@@ -309,7 +309,7 @@
 			return {
 				courses: courses,
 				days: days
-			}
+			};
 		},
 
 		// {institution}_{page}_{days separated by '-'}_{subject-number-crn}
@@ -352,7 +352,7 @@
 		},
 
 		updateFilters: function(days) {
-			var $boxes = this.$('input[name^="filter"]'), 
+			var $boxes = this.$('input[name^="filter"]'),
 				self = this;
 
 			$boxes.prop('checked', false);
@@ -362,7 +362,5 @@
 			});
 		}
 	});
-	
-	window.App = App;
 
 }(jQuery, Backbone, _, Handlebars, amplify));

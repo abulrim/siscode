@@ -41,7 +41,8 @@ input {
   -box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),0 0 8px rgba(82, 168, 236, 0.6);
 }
 /*********************/
-/**** layout ***/#logo {
+/**** layout ***/
+#logo {
   width: 127px;
   height: 33px;
   background: url(../img/logo_engraved.png);
@@ -67,6 +68,12 @@ input {
 /**** cil module css ***/
 .cil {
   margin-bottom: 10px;
+}
+.cil-institutions {
+  margin-bottom: 5px;
+}
+.cil-institutions select {
+  width: 100%;
 }
 .cil-expand-arrow {
   height: 30px;
@@ -184,6 +191,9 @@ input {
   background-repeat: repeat-x;
   filter: progid:dximagetransform.microsoft.gradient(startColorstr='@from', endColorstr='@to', GradientType=0);
   filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+.cil-add-course {
+  display: none;
 }
 .cil-add-course:active {
   background-color: #51A351;
@@ -382,10 +392,10 @@ input {
   position: absolute;
   border: thin solid;
   border-radius: 3px;
-  margin: 0 2px;
   padding: 0 3px;
   height: 100%;
-  width: 100%;
+  left: 1px;
+  right: 1px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
 }

@@ -6,7 +6,8 @@
 
   var App = window.App,
       webroot = $('body').data('webroot'),
-      institutions = $('#institutions-data').data('institutions');
+      institutions = $('#institutions-data').data('institutions'),
+      cacheKey = $('body').data('cache_key');
 
   // init router
   var router = new App.Router();
@@ -23,6 +24,7 @@
   // init course input module
   var courseScheduleView = new App.CourseScheduleView({
     webroot: webroot,
+    cacheKey: cacheKey,
     router: router
   });
 

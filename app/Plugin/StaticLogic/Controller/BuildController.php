@@ -1,6 +1,6 @@
 <?php
 class BuildController extends AppController {
-	
+
 	public $uses = array();
 
 	public function minify() {
@@ -24,7 +24,7 @@ class BuildController extends AppController {
 
 		//build less
 		$lessFiles = Configure::read('StaticLogic.less');
-		
+
 		if (!empty($lessFiles)) {
 			foreach($lessFiles as $file) {
 				$fullPath = $cssDirectory . $file . '.less';
@@ -33,14 +33,14 @@ class BuildController extends AppController {
 					unlink($fullCompiledPath);
 				}
 				if (file_exists($fullPath)) {
-					$command='lessc ' . $fullPath . ' > ' . $fullCompiledPath;				
+					$command='lessc ' . $fullPath . ' > ' . $fullCompiledPath;
 					$result = exec($command);
 				}
-				
+
 			}
 		}
-		
-		
+
+
 		foreach($cssFiles as $file){
 			$fullPath=$cssDirectory . $file . '.css';
 			$fullMinPath=$cssDirectory. $file . '.min.css';
@@ -51,9 +51,9 @@ class BuildController extends AppController {
 			YuiCompressor::compress($fullPath,$fullMinPath);
 		}
 
-		
-		
+
+
 		exit('done');
-		
+
 	}
 }
