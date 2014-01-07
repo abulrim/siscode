@@ -89,7 +89,7 @@ input {
 
 
 
-/**** layout ***/ 
+/**** layout ***/
 
 #logo {
 	width: 127px;
@@ -126,6 +126,12 @@ input {
 
 .cil {
 	margin-bottom: 10px;
+}
+.cil-institutions {
+	margin-bottom: 5px;
+}
+.cil-institutions select {
+	width: 100%;
 }
 .cil-expand-arrow {
 	height: 30px;
@@ -202,6 +208,9 @@ input {
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 	.btn-background-gradient(#5BB75B, #62C462, #51A351);
 }
+.cil-add-course {
+	display: none;
+}
 .cil-add-course:active {
 	background-color: #51A351;
 	background-image: none;
@@ -229,7 +238,7 @@ input {
 	&:hover {
 		background-color: #05C;
 		background-position: 0 -15px;
-	}	
+	}
 }
 .cil-remove-course {
 	position: absolute;
@@ -314,10 +323,10 @@ input {
 }
 .striped-background {
 	background: url('../img/background.png');
-	background: repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
-	background: -webkit-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
-	background: -moz-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
-	background: -o-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);  
+	background: repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);
+	background: -webkit-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);
+	background: -moz-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);
+	background: -o-repeating-linear-gradient(top, #efefef 0px,#efefef 39px,#efefef 40px,#efefef 40px,#ffffff 40px,#ffffff 80px);
 }
 .schedule-column {
 	position: relative;
@@ -367,10 +376,10 @@ input {
 	position: absolute;
 	border: thin solid;
 	border-radius: 3px;
-	margin: 0 2px;
 	padding: 0 3px;
 	height: 100%;
-	width: 100%;
+	left: 1px;
+	right: 1px;
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 }
@@ -448,7 +457,7 @@ input {
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
 }
-.paginator-arrow-right, .paginator-arrow-left {	
+.paginator-arrow-right, .paginator-arrow-left {
 	.icon;
 	display: block;
 	margin: 7px auto 0 auto;
@@ -658,7 +667,7 @@ input {
 	}
 
 	.social.fb {
-		margin-right: 8px; 
+		margin-right: 8px;
 	}
 	.l-results {
 		display: block;

@@ -32,7 +32,7 @@
  * In production mode, flash messages redirect after a time interval.
  * In development mode, you need to click the flash message to continue.
  */
-	Configure::write('debug', 2);
+	Configure::write('debug', 0);
 
 /**
  * Configure the Error handler used to handle errors for your application.  By default
@@ -282,8 +282,13 @@ Cache::config('_cake_model_', array(
 
 
 Configure::write('StaticLogic.js', array(
-	'course-input-module',
-	'handlebars-1.0.0.beta.6',
+	'appjs' . DS . 'helpers',
+	'appjs' . DS . 'app-module',
+	'appjs' . DS . 'course-input-module',
+	'appjs' . DS . 'schedule-module',
+	'appjs' . DS . 'save-module',
+	'appjs' . DS . 'route-module',
+	'appjs' . DS . 'main',
 	'jquery.tooltip'
 ));
 

@@ -5,6 +5,8 @@
 	<div class="l-input">
 		<section class="cil">
 			<div class="cil-main">
+				<div class="cil-institutions">
+				</div>
 				<div class="cil-courses">
 				</div>
 				<button class="cil-add-course" name="addCourse"><i class="cil-add-course-icon"></i>Add course</button>
@@ -44,7 +46,7 @@
 			<div class="cil-expand-arrow"><i class="cil-expand-arrow-down"></i></div>
 		</section>
 	</div>
-	
+
 	<div class="l-results">
 		<section class="schedule">
 			<div class="schedule-loader"></div>
@@ -115,16 +117,18 @@
 			<div class="paginator"></div>
 		</section>
 	</div>
-	
-	<div class="social-media">
-		<div class="social fb">
-			<div class="fb-like" data-href="http://www.facebook.com/siscode.me" data-send="false" data-layout="button_count" data-width="300" data-show-faces="false" data-font="arial"></div>
+
+	<?php if (Configure::read('debug') == 0): ?>
+		<div class="social-media">
+			<div class="social fb">
+				<div class="fb-like" data-href="http://www.facebook.com/siscode.me" data-send="false" data-layout="button_count" data-width="300" data-show-faces="false" data-font="arial"></div>
+			</div>
+			<div class="social twitter">
+				<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://siscode.me" data-text="Build your @AUB_Lebanon course schedule on" data-via="siscodeme">Tweet</a>
+			</div>
+			Last updated 30 April 2013 (Fall 2013-2014)
 		</div>
-		<div class="social twitter">
-			<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://siscode.me" data-text="Build your @AUB_Lebanon course schedule on" data-via="siscodeme">Tweet</a>
-		</div>
-		Last updated 30 April 2013 (Fall 2013-2014)
-	</div>
+	<?php endif; ?>
 </div>
 <div class="foot-bar">
 	<div class="foot-bar-top">
@@ -155,7 +159,16 @@
 	<div class="foot-bar-remove"><i class="foot-bar-remove-icon"></i></div>
 	<div class="clear"></div>
 <?php echo $this->HtmlLogic->endTemplate(); ?>
-	
+
+<?php echo $this->HtmlLogic->startTemplate(array('id' => 'institutions-select'));?>
+	<select name="institution_id" class="cil-institution" data-placeholder="Select a University">
+		<option value=''></option>
+		{{#each institutions}}
+			<option value="{{this.id}}">{{this.name}}</option>
+		{{/each}}
+	</select>
+<?php echo $this->HtmlLogic->endTemplate(); ?>
+
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>
 	<div class="cil-inputs-wrapper">
 		<div class="cil-inputs">
@@ -178,14 +191,14 @@
 	<div name="remove" class="cil-remove-course"><i class="cil-remove-course-btn"></i></div>
 	<div class="clear"></div>
 <?php echo $this->HtmlLogic->endTemplate(); ?>
-	
+
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-numbers')); ?>
 	<option value=''></option>
 	{{#each numbers}}
 		<option value="{{this}}">{{this}}</option>
 	{{/each}}
 <?php echo $this->HtmlLogic->endTemplate(); ?>
-	
+
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
 	<div class="schedule-course-slot-wrapper">
 		<div class="resp-long">{{start_time}} - {{end_time}}</div>
@@ -200,7 +213,7 @@
 		</div>
 	</div>
 <?php echo $this->HtmlLogic->endTemplate();?>
-		
+
 <?php echo $this->HtmlLogic->startTemplate(array('id' => 'pagination-view-tmpl'));?>
 	<div class="paginator-next"><i class="paginator-arrow-right"></i></div>
 	<div class="paginator-previous"><i class="paginator-arrow-left"></i></div>
@@ -208,4 +221,4 @@
 	<div class="clear"></div>
 <?php echo $this->HtmlLogic->endTemplate();?>
 
-<div id="subjects-data" data-subjects='<?php echo json_encode($subjects); ?>'></div>
+<div id="institutions-data" data-institutions='<?php echo json_encode($institutions); ?>'></div>

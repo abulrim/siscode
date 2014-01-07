@@ -30,7 +30,7 @@
 			var ssc = document.getElementsByTagName('script')[0];
 			ssc.parentNode.insertBefore(wsc, ssc);
 		})();
-		
+
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', 'UA-23314622-1']);
 		_gaq.push(['_trackPageview']);
@@ -42,30 +42,47 @@
 	</script>
 	<!-- End of Woopra Code -->
 	<!-- Hi Woopra Ticket 15633 -->
+	<?php else: ?>
+		<!-- fake woopra and google -->
+		<script type="text/javascript">
+			var _gaq = [];
+			var woopraTracker = {
+				pushEvent: function() {},
+				trackPageview: function() {}
+			};
+		</script>
 	<?php endif; ?>
+
 </head>
-<body data-cache_key="6" data-webroot="<?php echo $this->webroot; ?>">
+<body data-cache_key="<?php echo Configure::read('CacheKey'); ?>" data-webroot="<?php echo $this->webroot; ?>">
 	<?php echo $this->fetch('content'); ?>
-	
+
 	<!-- fb code -->
 	<div id="fb-root"></div>
 	<script>(function(d, s, id) {var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) return;js = d.createElement(s); js.id = id;js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";fjs.parentNode.insertBefore(js, fjs);}(document, 'script', 'facebook-jssdk'));</script>
-	
+
 	<!-- twitter of fb code -->
 	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-	
-	<?php echo $this->HtmlLogic->script('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');?>
-	<script>window.jQuery || document.write('<script type="text/javascript" src="<?php echo $this->webroot;?>js/jquery-1.7.2.min.js">\x3C/script>');</script>
-	
+
+	<?php echo $this->HtmlLogic->script('http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');?>
+	<script>window.jQuery || document.write('<script type="text/javascript" src="<?php echo $this->webroot;?>js/jquery-1.10.2.min.js">\x3C/script>');</script>
+
 	<?php echo $this->HtmlLogic->script('amplify.min'); ?>
-	
+
 	<?php echo $this->HtmlLogic->script(array(
 		'jquery.tooltip',
 		'underscore-min',
 		'chosen.jquery.min',
-		'handlebars-1.0.0.beta.6',
-		'backbone-min',
-		'course-input-module'
+		'handlebars-v1.3.0.min',
+		'backbone.min',
+
+		'appjs/helpers',
+		'appjs/app-module',
+		'appjs/course-input-module',
+		'appjs/schedule-module',
+		'appjs/save-module',
+		'appjs/route-module',
+		'appjs/main'
 	), array('combined' => true));?>
 </body>
 </html>
