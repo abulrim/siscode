@@ -302,3 +302,4 @@ Configure::write('StaticLogic.css', array(
 ));
 
 Configure::write('CacheKey', '1234');
+Configure::write('ClearCacheKey', '1234');

@@ -250,7 +250,7 @@ class CoursesController extends AppController {
 
 	public function clear_cache($key) {
 
-		if ($key != Configure::read('CacheKey')) {
+		if ($key != Configure::read('ClearCacheKey')) {
 			exit('Not done!');
 		}
 

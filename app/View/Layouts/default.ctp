@@ -2,7 +2,7 @@
 <!--[if lt IE 9]><html lang="en-us" class="ie8"><![endif]-->
 <!--[if gt IE 8]><!--><html lang="en-us"><!--<![endif]-->
 <head>
-	<meta name="description" content="SIScode is a free web application designed to help AUB students build their schedule without worrying about facing time conflicts during registration" />
+	<meta name="description" content="SIScode is a free web application designed to help AUB and LAU students build their schedule without worrying about facing time conflicts during registration" />
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1" />
 	<title>siscode</title>
