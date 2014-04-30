@@ -155,6 +155,7 @@ input {
 	display: block;
 }
 .cil-inputs-wrapper {
+	position: relative;
 	padding-right: 25px;
 }
  .cil-subject-wrapper {
@@ -207,9 +208,6 @@ input {
 	border-radius: 4px;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 	.btn-background-gradient(#5BB75B, #62C462, #51A351);
-}
-.cil-add-course {
-	display: none;
 }
 .cil-add-course:active {
 	background-color: #51A351;
@@ -403,7 +401,6 @@ input {
 	margin-top: -100px;
 	text-align: center;
 	z-index: 9;
-	display: none;
 }
 .resp-long {
 	display: none;
@@ -492,11 +489,18 @@ input {
 
 /******* tooltip CSS *********/
 .tooltip-content {
+	display: none;
 	position: absolute;
 	border-radius: 5px;
 	background-color: #FFF;
 	border: solid 3px #000;
 	min-width: 150px;
+	bottom: 100%;
+	margin-bottom: 6px;
+	left: 0;
+	width: 100%;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	.box-shadow(~"0px 0px 20px rgba(50, 50, 50, 1)");
 	z-index: 2;
 
@@ -511,6 +515,9 @@ input {
 		bottom: -16px;
 		border-color: #000 transparent transparent transparent;
 	}
+}
+.is-tooltip-shown .tooltip-content {
+	display: block;
 }
 .tooltip-title {
 	background-color: #EFEFEF;
@@ -551,7 +558,7 @@ input {
 	border-bottom: solid thin #BBB;
 }
 .foot-bar-toggle-wrapper {
-	padding-right: 40px;
+	margin-right: 40px;
 	height: 100%;
 }
 .foot-bar-toggle {
@@ -640,7 +647,6 @@ input {
 	width: 100%;
 }
 .foot-bar-edit-input {
-	display: none;
 	width: 100%;
 	height: 16px;
 	background-color: white;

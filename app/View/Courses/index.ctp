@@ -1,56 +1,93 @@
-<div id="logo"><a href="<?php echo $this->webroot; ?>"></a></div>
-<div class="clear"></div>
+<script type="text/x-handlebars">
+	<div id="logo"><a href="<?php echo $this->webroot; ?>"></a></div>
+	<div class="clear"></div>
 
-<div class="wrapper">
+	<div class="wrapper">
+		{{outlet}}
+
+		<?php if (Configure::read('debug') == 0): ?>
+			<div class="social-media">
+				<div class="social fb">
+					<div class="fb-like" data-href="http://www.facebook.com/siscode.me" data-send="false" data-layout="button_count" data-width="300" data-show-faces="false" data-font="arial"></div>
+				</div>
+				<div class="social twitter">
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://siscode.me" data-text="Build your uni schedule on" data-via="siscodeme">Tweet</a>
+				</div>
+				Last updated 30 April 2013 (Fall 2013-2014)
+			</div>
+		<?php endif; ?>
+	</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="schedule">
+	{{outlet}}
+	{{render "footer"}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/course-input">
+	<div class="cil-inputs-wrapper">
+		<div class="cil-inputs">
+			<div class="cil-course-floats cil-subject-wrapper">
+				{{chosen-select selectClass="cil-course-subject" content=subjects optionLabelPath="content.name" optionValuePath="content.id" value=model.subject}}
+			</div>
+			<div class="cil-course-floats cil-number-wrapper">
+				{{chosen-select selectClass="cil-course-subject" content=numbers value=model.number}}
+			</div>
+			<div class="cil-course-floats cil-crn-wrapper">
+				{{input class="cil-course-crn course-input" value=model.crn placeholder="CRN"}}
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="cil-remove-course" {{action "removeCourse"}}><i class="cil-remove-course-btn"></i></div>
+	</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/chosen-select">
+	{{view Em.Select class=selectClass content=content optionLabelPath=optionLabelPath optionValuePath=optionValuePath value=value selection=selection}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="inputs">
 	<div class="l-input">
 		<section class="cil">
 			<div class="cil-main">
 				<div class="cil-institutions">
+					{{chosen-select selectClass="cil-institution" content=institutions optionLabelPath="content.name" selection=selectedInstitution}}
 				</div>
 				<div class="cil-courses">
+					{{#each course in courses}}
+						{{course-input model=course subjects=subjects}}
+					{{/each}}
 				</div>
-				<button class="cil-add-course" name="addCourse"><i class="cil-add-course-icon"></i>Add course</button>
+				{{#if selectedInstitution}}
+					<button class="cil-add-course" {{action "addCourse"}}><i class="cil-add-course-icon"></i>Add course</button>
+				{{/if}}
 				<section class="cil-filters">
 					<h2><i class="cil-filter-btn"></i>Filter by day:</h2>
 					<table class="cil-filters-table">
 						<tr>
-							<td>
-								<input type="checkbox" id="filter1" name="filter[1]" checked="checked" value="1" />
-								<label for="filter1" onclick="">M</label>
-							</td>
-							<td>
-								<input type="checkbox" id="filter2" name="filter[2]" checked="checked" value="2" />
-								<label for="filter2" onclick="">T</label>
-							</td>
-							<td>
-								<input type="checkbox" id="filter3" name="filter[3]" checked="checked" value="3" />
-								<label for="filter3" onclick="">W</label>
-							</td>
-							<td>
-								<input type="checkbox" id="filter4" name="filter[4]" checked="checked" value="4" />
-								<label for="filter4" onclick="">R</label>
-							</td>
-							<td>
-								<input type="checkbox" id="filter5" name="filter[5]" checked="checked" value="5" />
-								<label for="filter5" onclick="">F</label>
-							</td>
-							<td>
-								<input type="checkbox" id="filter6" name="filter[6]" checked="checked" value="6" />
-								<label for="filter6" onclick="">S</label>
-							</td>
+							{{#each weekdays}}
+								<td>
+									{{input id=label type="checkbox" checked=checked}}
+									<label {{bind-attr for="label"}}>{{label}}</label>
+								</td>
+							{{/each}}
 						</tr>
 					</table>
 				</section>
-				<input type="button" class="cil-submit" value="Submit" />
+				<button class="cil-submit" {{action "submit"}}>Submit</button>
 			</div>
 			<div class="cil-expand-arrow"><i class="cil-expand-arrow-down"></i></div>
 		</section>
 	</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="calendar">
+
+	{{render "inputs"}}
 
 	<div class="l-results">
 		<section class="schedule">
 			<div class="schedule-loader"></div>
-			<div class="schedule-empty-error">No results! Take a break this semester, work at McDonalds instead</div>
 			<div class="schedule-header">
 				<ul class="schedule-weekdays">
 					<div class="resp-long">
@@ -107,118 +144,95 @@
 					</div>
 				</ul>
 			</div>
-			<div class="schedule-column day-1 schedule-day"></div>
-			<div class="schedule-column day-2 schedule-day"></div>
-			<div class="schedule-column day-3 schedule-day"></div>
-			<div class="schedule-column day-4 schedule-day"></div>
-			<div class="schedule-column day-5 schedule-day"></div>
-			<div class="schedule-column last day-6 schedule-day"></div>
-			<div class="paginator paginator-top"></div>
-			<div class="paginator"></div>
+			{{outlet}}
 		</section>
 	</div>
+</script>
 
-	<?php if (Configure::read('debug') == 0): ?>
-		<div class="social-media">
-			<div class="social fb">
-				<div class="fb-like" data-href="http://www.facebook.com/siscode.me" data-send="false" data-layout="button_count" data-width="300" data-show-faces="false" data-font="arial"></div>
-			</div>
-			<div class="social twitter">
-				<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://siscode.me" data-text="Build your @AUB_Lebanon course schedule on" data-via="siscodeme">Tweet</a>
-			</div>
-			Last updated 30 April 2013 (Fall 2013-2014)
+<script type="text/x-handlebars" data-template-name="courses">
+	{{#unless maxPage}}
+		<div class="schedule-empty-error">
+			{{errorMessage}}
 		</div>
-	<?php endif; ?>
-</div>
-<div class="foot-bar">
-	<div class="foot-bar-top">
-		<div class="foot-bar-toggle-wrapper">
-			<div class="foot-bar-toggle">
-				<i class="foot-bar-arrow"></i>
-			</div>
-		</div>
-		<div class="foot-bar-add">
-			<i class="foot-bar-add-icon"></i>
-		</div>
-	</div>
-	<div class="foot-bar-content">
-		<ul class="foot-bar-combination">
-		</ul>
-	</div>
-</div>
-<?php echo $this->HtmlLogic->startTemplate(array('id' => 'foot-bar-combination-tmpl')); ?>
-	<div class="foot-bar-combination-name-wrapper">
-		<div>
-			<a class="foot-bar-combination-name" href="<?php echo $this->webroot . 'c/'; ?>{{url}}" name="foot-bar-combination-name">{{name}}</a>
-		</div>
-		<div>
-			<input type="text" value="{{name}}" class="foot-bar-edit-input" />
-		</div>
-	</div>
-	<div class="foot-bar-edit"><i class="foot-bar-edit-icon"></i></div>
-	<div class="foot-bar-remove"><i class="foot-bar-remove-icon"></i></div>
-	<div class="clear"></div>
-<?php echo $this->HtmlLogic->endTemplate(); ?>
+	{{/unless}}
 
-<?php echo $this->HtmlLogic->startTemplate(array('id' => 'institutions-select'));?>
-	<select name="institution_id" class="cil-institution" data-placeholder="Select a University">
-		<option value=''></option>
-		{{#each institutions}}
-			<option value="{{this.id}}">{{this.name}}</option>
-		{{/each}}
-	</select>
-<?php echo $this->HtmlLogic->endTemplate(); ?>
-
-<?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-tmpl'));?>
-	<div class="cil-inputs-wrapper">
-		<div class="cil-inputs">
-			<div class="cil-course-floats cil-subject-wrapper">
-				<select name="subject_id" class="cil-course-subject" data-placeholder="Select a Subject">
-					<option value=''></option>
-					{{#each subjects}}
-						<option value="{{this.id}}">{{this.name}}</option>
-					{{/each}}
-				</select>
-			</div>
-			<div class="cil-course-floats cil-number-wrapper">
-				<select name="number" class="cil-course-number" data-placeholder="Number">
-				</select>
-			</div>
-			<div class="cil-course-floats cil-crn-wrapper"><input type="text" class="cil-course-crn course-input" name="crn" value="{{crn}}" placeholder="CRN" /></div>
-			<div class="clear"></div>
+	{{#each day in days}}
+		<div class="schedule-column schedule-day">
+			{{#each slot in day}}
+				{{course-slot model=slot}}
+			{{/each}}
 		</div>
-	</div>
-	<div name="remove" class="cil-remove-course"><i class="cil-remove-course-btn"></i></div>
-	<div class="clear"></div>
-<?php echo $this->HtmlLogic->endTemplate(); ?>
-
-<?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-input-numbers')); ?>
-	<option value=''></option>
-	{{#each numbers}}
-		<option value="{{this}}">{{this}}</option>
 	{{/each}}
-<?php echo $this->HtmlLogic->endTemplate(); ?>
+	<div class="paginator paginator-top">
+		{{course-paginator maxPage=maxPage page=page}}
+	</div>
+	<div class="paginator">
+		{{course-paginator maxPage=maxPage page=page}}
+	</div>
+</script>
 
-<?php echo $this->HtmlLogic->startTemplate(array('id' => 'course-slot-view-tmpl'));?>
-	<div class="schedule-course-slot-wrapper">
-		<div class="resp-long">{{start_time}} - {{end_time}}</div>
-		{{Course.subject_code}} {{Course.number}}
-		<div class="tooltip-content">
-			<div class="tooltip-title">{{Course.title}}</div>
-			<div class="tooltip-body">
-				CRN: {{Course.crn}}
-				<br>Instructor: {{Instructor.name}}
-				<div class="resp-small">{{start_time}} - {{end_time}}</div>
+<script type="text/x-handlebars" data-template-name="footer">
+	<div {{bind-attr class=":foot-bar isOpen:toggled"}}>
+		<div class="foot-bar-top">
+			<div class="foot-bar-toggle-wrapper" {{action "toggleOpen"}}>
+				<div class="foot-bar-toggle">
+					<i class="foot-bar-arrow"></i>
+				</div>
+			</div>
+			<div class="foot-bar-add" {{action "addNew"}}>
+				<i class="foot-bar-add-icon"></i>
 			</div>
 		</div>
+		<div class="foot-bar-content">
+			<ul class="foot-bar-combination">
+				{{#each savedCombinations}}
+					<li>
+						{{footer-input model=this}}
+					</li>
+				{{/each}}
+			</ul>
+		</div>
 	</div>
-<?php echo $this->HtmlLogic->endTemplate();?>
+</script>
 
-<?php echo $this->HtmlLogic->startTemplate(array('id' => 'pagination-view-tmpl'));?>
-	<div class="paginator-next"><i class="paginator-arrow-right"></i></div>
-	<div class="paginator-previous"><i class="paginator-arrow-left"></i></div>
+<script type="text/x-handlebars" data-template-name="components/footer-input">
+	{{#unless isEdit}}
+		<div>
+			<a class="foot-bar-combination-name" name="foot-bar-combination-name">{{model.name}}</a>
+		</div>
+	{{else}}
+		<div>
+			{{input value=model.name class="foot-bar-edit-input"}}
+		</div>
+	{{/unless}}
+	<div class="foot-bar-edit" {{action "edit"}}><i class="foot-bar-edit-icon"></i></div>
+	<div class="foot-bar-remove" {{action "remove" this}}><i class="foot-bar-remove-icon"></i></div>
+	<div class="clear"></div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/course-slot">
+	<div class="resp-long">{{model.startTime}} - {{model.endTime}}</div>
+	{{model.course.code}} {{model.course.number}}
+	<div class="tooltip-content">
+		<div class="tooltip-title">{{model.course.title}}</div>
+		<div class="tooltip-body">
+			CRN: {{model.course.crn}}
+			<br>Instructor: {{model.instructor}}
+			<div class="resp-small">{{model.startTime}} - {{model.endTime}}</div>
+		</div>
+	</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/course-paginator">
+	<div {{bind-attr class=":paginator-next showNext::paginator-disabled"}} {{action "fetch" "next"}}><i class="paginator-arrow-right"></i></div>
+	<div {{bind-attr class=":paginator-previous showPrevious::paginator-disabled"}}  {{action "fetch" "previous"}}><i class="paginator-arrow-left"></i></div>
 	<div class="paginator-text">{{page}}/{{maxPage}}</div>
 	<div class="clear"></div>
-<?php echo $this->HtmlLogic->endTemplate();?>
+</script>
 
-<div id="institutions-data" data-institutions='<?php echo json_encode($institutions); ?>'></div>
+<script>
+	window.config = {
+		institutions: <?php echo json_encode($institutions); ?>,
+		webroot: "<?php echo $this->webroot; ?>"
+	}
+</script>
