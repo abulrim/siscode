@@ -109,7 +109,12 @@ class CoursesController extends AppController {
 				}
 				$combinationsCourseIds = array();
 				if (!empty($courses)) {
+					$time_start = microtime(true);
 					$combinations = $this->_getCombinations($courses, $combinations);
+			    $time_end = microtime(true);
+			    $time = $time_end - $time_start;
+			    FireCake::log($time);
+
 					foreach($combinations as $combination) {
 						$combinationsCourseIds[] = Hash::extract($combination, '{n}.Course.id');
 					}
@@ -177,38 +182,52 @@ class CoursesController extends AppController {
 		$this->set('_serialize', 'content');
 	}
 
+	// http://stackoverflow.com/questions/2516599/php-2d-array-output-all-combinations for reference
 	protected function _getCombinations($inputs, $combinations = array()) {
 
-		foreach($inputs as $input) {
-			$combinations = $this->_checkConflict($combinations, $input);
-			if (empty($combinations)) {
-				return $combinations;
-			}
-		}
-		return $combinations;
-	}
+		$totalCombinations = 0;
 
-	//returns all the combinations between $combinations and $input
-	protected function _checkConflict($combinations, $input) {
-		$newCombination = array();
-
-		//First run fill the combinations array with the first input
-		if (empty($combinations)) {
-			foreach ($input as $key => $el) {
-				$input[$key] = array($el);
-			}
-			return $input;
+		// total combination size
+		$count = count($inputs);
+		$size = intval($count > 0);
+		foreach ($inputs as $input) {
+			$size *= count($input);
 		}
-		//If not first run loop through the rest of the inputs
-		foreach($input as $course) {
-			foreach($combinations as $combination) {
+
+		for ($i = 0; $i < $size; $i ++) {
+			$combination = array();
+
+			foreach ($inputs as $input) {
+				$course = current($input);
+
 				if (!$this->_isTimeConflict($combination, $course)) {
 					$combination[] = $course;
-					$newCombination[] = $combination;
+				} else {
+					$combination = array();
+					break;
 				}
 			}
+
+			// move array indeces
+			for ($j = $count - 1; $j >= 0; $j--) {
+				if (next($inputs[$j])) {
+					break;
+				} elseif (isset ($inputs[$j])) {
+					reset($inputs[$j]);
+				}
+			}
+
+			if (!empty($combination)) {
+				$totalCombinations++;
+				$combinations[] = $combination;
+			}
+
+			if ($totalCombinations > 999) {
+				break;
+			}
 		}
-		return $newCombination;
+
+		return $combinations;
 	}
 
 	//returns if time conflict occurs
